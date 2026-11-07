@@ -21,3 +21,24 @@ Tugasmu:
 1. Buatkan file induk `DashboardPage.jsx` yang meng-import dan menyusun keempat komponen tersebut persis seperti gambar desain utuh yang saya lampirkan ini.
 2. Pastikan tata letak Grid/Flexbox-nya rapi dan proporsional di layar laptop maupun HP.
 3. Jika halaman ini memiliki tampilan berbeda antara Mode Mentee dan Mode Mentor, hubungkan dengan prop atau state `userRole` agar komponen di dalamnya menyesuaikan secara otomatis.
+
+
+Kami sudah menyelesaikan 8 Page Inti untuk proyek React JS kami menggunakan `react-router-dom`.
+Berikut adalah daftar 8 file halaman utama kami beserta lokasinya di dalam folder `src/pages/`:
+
+<!-- [UBAH DI SINI]: Sesuaikan dengan nama 8 file Page Inti kalian -->
+1. `src/pages/Page1_Auth.jsx` (Alamat URL: `/login`)
+2. `src/pages/Page2_Dashboard.jsx` (Alamat URL: `/`)
+3. `src/pages/Page3_CariMentor.jsx` (Alamat URL: `/cari-mentor`)
+4. `src/pages/Page4_JadwalSesi.jsx` (Alamat URL: `/jadwal-sesi`)
+5. `src/pages/Page5_Rating.jsx` (Alamat URL: `/rating`)
+6. `src/pages/Page6_Profil.jsx` (Alamat URL: `/profil`)
+7. `src/pages/Page7_TopUpDompet.jsx` (Alamat URL: `/top-up`)
+8. `src/pages/Page8_AdminPanel.jsx` (Alamat URL: `/admin`)
+
+Serta komponen `Navbar.jsx` kami:
+[Tempel kode Navbar.jsx di sini]
+
+Tolong buatkan:
+1. Kode lengkap `App.jsx` yang membungkus halaman-halaman tersebut dengan `BrowserRouter`, `Routes`, dan `Route`, serta menyimpan state global `isMentorMode` (Mode Mentee vs Mode Mentor) agar saat pengguna mengganti mode di halaman Profil/Navbar, tampilan Navbar dan Dashboard ikut berubah.
+2. Perbarui kode `Navbar.jsx` kami menggunakan `NavLink` atau `Link` dari `react-router-dom` agar saat menu di atas diklik, halaman benar-benar berpindah dan tab putih aktifnya berpindah mengikuti halaman yang sedang dibuka!
