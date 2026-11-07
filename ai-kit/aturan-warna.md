@@ -11,12 +11,15 @@ Jangan menggunakan kode warna lain di luar daftar ini.
 | `bg-accent` / `border-accent` / `text-accent` | `#7CD5C7` | Aksen, border, highlight, gradien |
 | `bg-lightBg` | `#F2F2ED` | Canvas dan permukaan ringan (background halaman/luar kartu) |
 
-## 2. Aturan Komponen & Interaksi
-1. **Tombol Utama (Primary / CTA Button):**
-   `bg-secondary hover:opacity-90 text-white font-medium px-5 py-2.5 rounded-lg transition-all duration-200`
-2. **Tombol Kedua (Secondary / Outline Button):**
-   `bg-white hover:bg-lightBg text-primary border border-primary font-medium px-5 py-2.5 rounded-lg transition-all duration-200`
-3. **Efek Kartu (Card Hover):**
-   Semua kartu daftar mentor atau materi menggunakan `bg-white rounded-xl shadow-sm border border-accent/40 hover:shadow-md transition-all`.
-4. **Ikon:**
-   Wajib menggunakan paket `lucide-react` (Jangan pakai SVG panjang di dalam kodingan halaman).
+## 2. Standar Bentuk Komponen (UI Style)
+<!-- [UBAH DI SINI]: Jika ada bentuk lengkungan atau bayangan yang ingin kamu ubah, edit di bagian ini -->
+
+1. **Lengkungan Sudut (Border Radius):**
+   - **Tombol Utama & Tombol Top Up:** Bentuk kapsul penuh (`rounded-full`).
+   - **Kartu Konten Besar (Jadwal, Misi, Statistik Bawah):** Lengkungan besar yang lembut (`rounded-2xl` atau `rounded-3xl`).
+2. **Gaya Kartu Putih (Card):**
+   - `bg-white border border-softMint rounded-2xl p-6 shadow-sm`
+3. **Gaya Navbar Atas:**
+   - Latar belakang `bg-darkNavy` dengan efek *tab* menu yang sedang aktif menyatu ke warna latar bawah (`bg-lightBg text-primary font-bold rounded-t-2xl`).
+4. **Paket Ikon:**
+   - Wajib menggunakan `lucide-react` (Contoh: `Calendar`, `Flame`, `Bell`, `ArrowUpRight`, `CheckCircle2`, `Clock`, `Target`).
