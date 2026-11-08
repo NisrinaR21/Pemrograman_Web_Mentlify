@@ -1,20 +1,20 @@
-```markdown
-# 📋 Peta Distribusi 8 Page Inti Mentlify (60 Frame Figma)
+# 📋 Peta Distribusi 9 Page Inti Mentlify (60 Frame Figma)
 
-Di bawah ini adalah pembagian **8 Page Inti** antara **Nisrina (Dev 1)** dan **Dea (Dev 2)**. 
+Di bawah ini adalah pembagian **9 Page Inti** antara **Nisrina (Dev 1)** dan **Dhiya (Dev 2)**. 
 Ingat: Tampilan kosong (*empty state*), tampilan berisi, *sub-menu* (seperti Pengaturan Akun di dalam Profil), dan *Pop-up Overlay* **tidak dihitung sebagai Page Inti baru**, melainkan dimasukkan ke dalam folder Page Inti induknya masing-masing!
 
 ---
 
-## 🗂️ Struktur Penyimpanan Screenshot di `ai-kit/potongan-figma/`
+## 🗂️ Struktur Penyimpanan Screenshot di `ai-kit/ss-figma/`
 
 ```text
-ai-kit/potongan-figma/
-├── Page-01-Auth-Onboarding/        <-- [UBAH DI SINI: Sesuaikan nama 8 Page Inti kalian]
-├── Page-02-Dashboard/              <-- (Sudah termasuk Mode Mentee & Mentor, Jadwal Kosong/15m, Misi)
-├── Page-03-Cari-Mentor-Booking/    <-- (Sudah termasuk Filter, Detail Mentor, & Pop-up Booking)
-├── Page-04-Jadwal-Ruang-Sesi/      <-- (Sudah termasuk Jadwal Mendatang, Riwayat, & Ruang Sesi Live)
-├── Page-05-Rating-Ulasan/          <-- (Sudah termasuk Form Beri Rating & Daftar Ulasan)
-├── Page-06-Profil-Pengaturan/      <-- (Sudah termasuk Biodata, Tombol Ganti Mode, & Sub-page Pengaturan Akun)
-├── Page-07-TopUp-Dompet-Payout/    <-- (Sudah termasuk Top Up Koin Mentee & Tarik Dana Mentor)
-└── Page-08-Admin-Moderator/        <-- (Sudah termasuk Verifikasi Mentor, Dispute, & Payout Admin)
+ai-kit/ss-figma/
+├── page01-login/        <-- (Dipakai bersama: Login, Register, Lupa Password, Topik Minat)
+├── page02-dashbor/      <-- (Mentee & Mentor: Dasbor Utama, Jadwal 15m/Kosong, Kuis, Manajemen Soal)
+├── page03-CariMentor/   <-- (Mentee: Filter Pencarian, Kartu Mentor, Pop-up Detail, & Booking)
+├── page04-JadwalSesi/   <-- (Mentee & Mentor: Jadwal Utama, Ruang Tunggu, Ruang Obrolan, Kalender, Banding)
+├── page05-rating/       <-- (Mentee & Mentor: Daftar Menunggu Ulasan, Form Bintang, Daftar Ulasan Diterima)
+├── page06-profile/      <-- (Mentee & Mentor: Profil Mode Baca, Edit Profil, & Pengaturan Keamanan Akun)
+├── page07-TopUp/        <-- (Mentee & Mentor: Top Up Koin Mentee, QRIS, & Payout/Tarik Dana Mentor)
+├── page08-ADMver/       <-- (Khusus Admin: Tabel Calon Mentor, Cek Dokumen CV, Form Tolak)
+└── page09-ADMfin/       <-- (Khusus Admin: Tabel Request Payout, Dispute/Banding Sesi, Upload Bukti Transfer)
