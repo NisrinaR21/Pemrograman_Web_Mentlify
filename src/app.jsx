@@ -7,6 +7,9 @@ import ProfilePage from './pages/ProfilePage.jsx';
 import AdminLoginPage from './components/page08-ADMver/AdminLoginPage.jsx';
 import AdminVerificationPage from './components/page08-ADMver/adminverificationpage.jsx';
 import AdminFinancePage from './components/page08-ADMver/AdminFinancePage.jsx';
+import CariMentorPage from './components/page03-CariMentor/CariMentorPage.jsx';
+import JadwalSesiPage from './pages/JadwalSesiPage.jsx';
+import RatingPage from './pages/RatingPage.jsx';
 
 function App() {
   const location = useLocation();
@@ -29,6 +32,12 @@ function App() {
     }
   }, [location.pathname]);
 
+  const isAuthPage =
+    location.pathname === '/login' ||
+    location.pathname === '/auth' ||
+    location.pathname === '/onboarding' ||
+    location.pathname === '/admin/login';
+
   const handleLogout = () => {
     navigate('/login');
   };
@@ -40,15 +49,17 @@ function App() {
 
   return (
     <div className="min-h-screen bg-lightBg font-sans">
-      <Navbar
-        userRole={userRole}
-        setUserRole={setUserRole}
-        onLogout={handleLogout}
-      />
+      {!isAuthPage && (
+        <Navbar
+          userRole={userRole}
+          setUserRole={setUserRole}
+          onLogout={handleLogout}
+        />
+      )}
 
       <Routes>
         {/* =========================================
-            1. RUTE AUTENTIKASI USER (AuthForm)
+            1. RUTE AUTENTIKASI (User & Admin)
            ========================================= */}
         <Route path="/login" element={<AuthForm onSuccessLogin={() => navigate('/')} />} />
         <Route path="/auth" element={<AuthForm onSuccessLogin={() => navigate('/')} />} />
@@ -56,6 +67,8 @@ function App() {
           path="/onboarding"
           element={<AuthForm onSuccessLogin={() => navigate('/')} initialMode="onboarding" />}
         />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
 
         {/* =========================================
             2. RUTE DASBOR (DashboardPage)
@@ -65,16 +78,34 @@ function App() {
         <Route path="/mentor/dasbor" element={<DashboardPage userRole="mentor" />} />
 
         {/* =========================================
-            3. RUTE ADMIN (Admin Verification & Finance)
+            3. RUTE ADMIN (Verifikasi & Keuangan)
            ========================================= */}
-        <Route path="/admin/login" element={<AdminLoginPage />} />
-        <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
         <Route path="/admin/verifikasi-mentor" element={<AdminVerificationPage />} />
         <Route path="/admin/finance" element={<AdminFinancePage />} />
         <Route path="/admin/keuangan-dispute" element={<AdminFinancePage />} />
 
         {/* =========================================
-            4. RUTE PROFIL & PENGATURAN (ProfilePage)
+            4. RUTE MENTEE: CARI MENTOR
+           ========================================= */}
+        <Route path="/cari-mentor" element={<CariMentorPage />} />
+        <Route path="/mentee/cari-mentor" element={<CariMentorPage />} />
+
+        {/* =========================================
+            5. RUTE JADWAL SESI
+           ========================================= */}
+        <Route path="/jadwal-sesi" element={<JadwalSesiPage />} />
+        <Route path="/mentee/jadwal-sesi" element={<JadwalSesiPage />} />
+        <Route path="/mentor/jadwal-sesi" element={<JadwalSesiPage />} />
+
+        {/* =========================================
+            6. RUTE RATING
+           ========================================= */}
+        <Route path="/rating" element={<RatingPage userRole={userRole} />} />
+        <Route path="/mentee/rating" element={<RatingPage userRole="mentee" />} />
+        <Route path="/mentor/rating" element={<RatingPage userRole="mentor" />} />
+
+        {/* =========================================
+            7. RUTE PROFIL & PENGATURAN (ProfilePage)
            ========================================= */}
         <Route
           path="/profil"
@@ -108,7 +139,7 @@ function App() {
         />
 
         {/* =========================================
-            5. FALLBACK REDIRECT
+            8. FALLBACK REDIRECT
            ========================================= */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
