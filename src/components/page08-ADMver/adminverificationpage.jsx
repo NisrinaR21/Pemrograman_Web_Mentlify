@@ -543,7 +543,21 @@ export default function AdminVerificationPage() {
 
       {/* Header */}
       <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 sm:px-6">
-        <h1 className="font-['Merriweather'] text-lg font-bold text-primary">Verification Admin</h1>
+        <div className="flex items-center gap-6">
+          <h1 className="font-['Merriweather'] text-lg font-bold text-primary">Verification Admin</h1>
+          <nav className="hidden sm:flex items-center gap-2">
+            <span className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-secondary/10 text-secondary border border-secondary/20">
+              Verifikasi Mentor
+            </span>
+            <button
+              type="button"
+              onClick={() => navigate('/admin/finance')}
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-500 hover:text-primary hover:bg-slate-100 transition-colors"
+            >
+              Keuangan &amp; Payout
+            </button>
+          </nav>
+        </div>
         <div className="flex items-center gap-3">
           <div className="hidden text-right sm:block">
             <p className="font-['Merriweather'] text-sm font-bold text-primary">Theo Rodriguez</p>

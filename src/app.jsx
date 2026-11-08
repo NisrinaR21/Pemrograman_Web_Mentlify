@@ -6,7 +6,7 @@ import DashboardPage from './pages/DashboardPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import AdminLoginPage from './components/page08-ADMver/AdminLoginPage.jsx';
 import AdminVerificationPage from './components/page08-ADMver/adminverificationpage.jsx';
-import AdminFinancePage from './components/page08-ADMver/AdminFinancePage.jsx';
+import AdminFinancePage from './pages/AdminFinancePage.jsx';
 import CariMentorPage from './components/page03-CariMentor/CariMentorPage.jsx';
 import JadwalSesiPage from './pages/JadwalSesiPage.jsx';
 import RatingPage from './pages/RatingPage.jsx';
@@ -84,6 +84,7 @@ function App() {
         <Route path="/admin/verifikasi-mentor" element={<AdminVerificationPage />} />
         <Route path="/admin/finance" element={<AdminFinancePage />} />
         <Route path="/admin/keuangan-dispute" element={<AdminFinancePage />} />
+        <Route path="/admin/keuangan" element={<AdminFinancePage />} />
 
         {/* =========================================
             4. RUTE MENTEE: CARI MENTOR
