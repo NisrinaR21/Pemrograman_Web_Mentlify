@@ -10,18 +10,20 @@ import {
     X,
     Plus,
     ArrowUpRight,
-    GraduationCap,
-    Code,
-    Headphones,
-    Palette,
-    Microscope,
-    Globe,
-    BookOpen,
-    Calculator,
-    Camera,
-    Rocket,
-    Music,
 } from 'lucide-react';
+
+import umrah01 from '../../assets/umrah-01.png';
+import umrah02 from '../../assets/umrah-02.png';
+import umrah03 from '../../assets/umrah-03.png';
+import umrah04 from '../../assets/umrah-04.png';
+import umrah05 from '../../assets/umrah-05.png';
+import umrah06 from '../../assets/umrah-06.png';
+import umrah07 from '../../assets/umrah-07.png';
+import umrah08 from '../../assets/umrah-08.png';
+import umrah09 from '../../assets/umrah-09.png';
+import umrah10 from '../../assets/umrah-10.png';
+import umrah11 from '../../assets/umrah-11.png';
+import umrah12 from '../../assets/umrah-12.png';
 
 /* =========================================================
    DATA DUMMY
@@ -45,35 +47,37 @@ const STATISTIK_MENTOR = [
 
 const MAX_BIO = 180;
 
-// 12 karakter avatar resmi Mentlify (dummy: ikon Lucide + warna latar)
+// 12 foto profil resmi mahasiswa UMRAH Mentlify
 const DAFTAR_AVATAR = [
-    { id: 1, ikon: User, warna: '#FF6B5B' },
-    { id: 2, ikon: GraduationCap, warna: '#E6177A' },
-    { id: 3, ikon: Calculator, warna: '#1D4ED8' },
-    { id: 4, ikon: Code, warna: '#0F766E' },
-    { id: 5, ikon: Globe, warna: '#FACC15' },
-    { id: 6, ikon: Microscope, warna: '#F97316' },
-    { id: 7, ikon: Headphones, warna: '#5EEAD4' },
-    { id: 8, ikon: Rocket, warna: '#A78BFA' },
-    { id: 9, ikon: Music, warna: '#BE123C' },
-    { id: 10, ikon: BookOpen, warna: '#84CC16' },
-    { id: 11, ikon: Palette, warna: '#EC4899' },
-    { id: 12, ikon: Camera, warna: '#22D3EE' },
+    { id: 1, foto: umrah01, nama: 'Avatar Mahasiswa 01' },
+    { id: 2, foto: umrah02, nama: 'Avatar Mahasiswa 02' },
+    { id: 3, foto: umrah03, nama: 'Avatar Mahasiswa 03' },
+    { id: 4, foto: umrah04, nama: 'Avatar Mahasiswa 04' },
+    { id: 5, foto: umrah05, nama: 'Avatar Mahasiswa 05' },
+    { id: 6, foto: umrah06, nama: 'Avatar Mahasiswa 06' },
+    { id: 7, foto: umrah07, nama: 'Avatar Mahasiswa 07' },
+    { id: 8, foto: umrah08, nama: 'Avatar Mahasiswa 08' },
+    { id: 9, foto: umrah09, nama: 'Avatar Mahasiswa 09' },
+    { id: 10, foto: umrah10, nama: 'Avatar Mahasiswa 10' },
+    { id: 11, foto: umrah11, nama: 'Avatar Mahasiswa 11' },
+    { id: 12, foto: umrah12, nama: 'Avatar Mahasiswa 12' },
 ];
 
 /* =========================================================
    KOMPONEN KECIL BANTUAN
    ========================================================= */
 
-function AvatarBulat({ avatarId, ukuran = 'w-12 h-12', ukuranIkon = 24, bingkai = '' }) {
+function AvatarBulat({ avatarId, ukuran = 'w-12 h-12', bingkai = '' }) {
     const avatar = DAFTAR_AVATAR.find((a) => a.id === avatarId) || DAFTAR_AVATAR[0];
-    const Ikon = avatar.ikon;
     return (
         <div
-            className={`${ukuran} ${bingkai} rounded-full flex items-center justify-center text-white shrink-0`}
-            style={{ backgroundColor: avatar.warna }}
+            className={`${ukuran} ${bingkai} rounded-full overflow-hidden bg-white shrink-0 flex items-center justify-center shadow-inner`}
         >
-            <Ikon size={ukuranIkon} strokeWidth={1.8} />
+            <img
+                src={avatar.foto}
+                alt={avatar.nama}
+                className="h-full w-full object-cover object-center"
+            />
         </div>
     );
 }
@@ -107,10 +111,10 @@ function StatistikMentor() {
 
 /* =========================================================
    SUB-KOMPONEN 1: HeaderProfil
-   (saklar MODE AKUN: Mentor / Mentee — state dimiliki ProfilData)
+   (saklar MODE AKUN: Mentor / Mentee)
    ========================================================= */
 
-function HeaderProfil({ userRole, onGantiRole }) {
+function HeaderProfil({ userRole, onGantiRole, isEditing }) {
     const daftarRole = [
         { id: 'mentor', label: 'Mentor' },
         { id: 'mentee', label: 'Mentee' },
@@ -119,42 +123,49 @@ function HeaderProfil({ userRole, onGantiRole }) {
     return (
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
-                <p className="text-[11px] font-bold text-secondary tracking-widest uppercase">Profil Utama</p>
-                <h1 className="text-3xl font-light text-primary mt-1">Profil Utama</h1>
-                <p className="text-sm text-slate-500 mt-2">
+                <p className="text-[11px] font-bold text-secondary tracking-widest uppercase">
+                    Identitas Akun
+                </p>
+                <h1 className="text-3xl font-extrabold text-primary mt-1">Profil Utama</h1>
+                <p className="text-sm text-slate-500 mt-1">
                     Avatar, profil akademik, dan topik bimbingan Anda dalam satu tampilan.
                 </p>
             </div>
 
-            <div className="flex items-center gap-3">
-                <span className="text-xs font-bold text-slate-500 tracking-wider uppercase">Mode Akun</span>
-                <div className="flex items-center rounded-full border border-accent bg-white p-1">
-                    {daftarRole.map((role) => (
-                        <button
-                            key={role.id}
-                            type="button"
-                            onClick={() => onGantiRole(role.id)}
-                            className={`rounded-full px-5 py-1.5 text-sm font-bold transition-all duration-200 ${userRole === role.id
-                                ? 'bg-secondary text-white shadow-sm hover:brightness-110'
-                                : 'text-slate-500 hover:text-secondary'
-                                }`}
-                        >
-                            {role.label}
-                        </button>
-                    ))}
+            {!isEditing && (
+                <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-slate-500 tracking-wider uppercase">Mode Akun</span>
+                    <div className="flex items-center rounded-full border border-accent bg-white p-1 shadow-sm">
+                        {daftarRole.map((role) => {
+                            const isAktif = userRole === role.id;
+                            return (
+                                <button
+                                    key={role.id}
+                                    type="button"
+                                    onClick={() => onGantiRole(role.id)}
+                                    className={`rounded-full px-5 py-1.5 text-sm font-bold transition-all duration-200 ${
+                                        isAktif
+                                            ? 'bg-secondary text-white shadow-sm hover:brightness-110'
+                                            : 'text-slate-500 hover:text-secondary'
+                                    }`}
+                                >
+                                    {role.label}
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
 
 /* =========================================================
    SUB-KOMPONEN 2: FormBiodata
-   (memiliki state isEditing: false = mode baca, true = mode edit)
+   (menerima isEditing, onStartEdit, onEndEdit dari induk)
    ========================================================= */
 
-function FormBiodata({ userRole, initialEditing = false }) {
-    const [isEditing, setIsEditing] = useState(initialEditing);
+function FormBiodata({ userRole, isEditing, onStartEdit, onEndEdit }) {
     const [profil, setProfil] = useState(DATA_AWAL);
     const [draft, setDraft] = useState(DATA_AWAL);
     const [tampilInputTopik, setTampilInputTopik] = useState(false);
@@ -169,14 +180,14 @@ function FormBiodata({ userRole, initialEditing = false }) {
         setTampilInputTopik(false);
         setTopikBaru('');
         setTersimpan(false);
-        setIsEditing(true);
+        if (onStartEdit) onStartEdit();
     };
 
     const batalEdit = () => {
         setDraft(profil);
         setTampilInputTopik(false);
         setTopikBaru('');
-        setIsEditing(false);
+        if (onEndEdit) onEndEdit();
     };
 
     const simpanPerubahan = () => {
@@ -184,7 +195,7 @@ function FormBiodata({ userRole, initialEditing = false }) {
         setProfil(draft);
         setTampilInputTopik(false);
         setTopikBaru('');
-        setIsEditing(false);
+        if (onEndEdit) onEndEdit();
         setTersimpan(true);
         setTimeout(() => setTersimpan(false), 3000);
     };
@@ -324,10 +335,10 @@ function FormBiodata({ userRole, initialEditing = false }) {
                     {isEditing && (
                         <div className="relative mt-5 pt-5 border-t border-white/20 flex flex-col lg:flex-row lg:items-center gap-4">
                             <div className="lg:w-44 shrink-0">
-                                <p className="text-sm font-bold">Pilih karakter avatar</p>
-                                <p className="text-xs text-white/80 mt-1">Gunakan satu dari 12 karakter resmi Mentlify.</p>
+                                <p className="text-sm font-bold">Pilih foto avatar</p>
+                                <p className="text-xs text-white/80 mt-1">Gunakan salah satu dari 12 foto profil resmi mahasiswa UMRAH.</p>
                             </div>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2.5">
                                 {DAFTAR_AVATAR.map((avatar) => {
                                     const terpilih = draft.avatarId === avatar.id;
                                     return (
@@ -335,14 +346,17 @@ function FormBiodata({ userRole, initialEditing = false }) {
                                             key={avatar.id}
                                             type="button"
                                             onClick={() => ubahField('avatarId', avatar.id)}
-                                            aria-label={`Pilih avatar ${avatar.id}`}
-                                            className={`relative rounded-xl bg-lightBg p-1.5 transition-all duration-200 hover:scale-105 ${terpilih ? 'ring-2 ring-accent' : 'hover:ring-2 hover:ring-white/60'
-                                                }`}
+                                            aria-label={`Pilih ${avatar.nama}`}
+                                            className={`relative rounded-full p-0.5 transition-all duration-200 hover:scale-110 ${
+                                                terpilih
+                                                    ? 'ring-4 ring-accent shadow-md scale-105'
+                                                    : 'opacity-85 hover:opacity-100 hover:ring-2 hover:ring-white/80'
+                                            }`}
                                         >
-                                            <AvatarBulat avatarId={avatar.id} ukuran="w-10 h-10" ukuranIkon={20} />
+                                            <AvatarBulat avatarId={avatar.id} ukuran="w-12 h-12" />
                                             {terpilih && (
-                                                <span className="absolute -top-1.5 -right-1.5 rounded-full bg-secondary text-white w-4 h-4 flex items-center justify-center border border-white">
-                                                    <Check size={10} strokeWidth={3} />
+                                                <span className="absolute -top-1 -right-1 rounded-full bg-secondary text-white w-5 h-5 flex items-center justify-center border-2 border-white shadow">
+                                                    <Check size={11} strokeWidth={3} />
                                                 </span>
                                             )}
                                         </button>
@@ -487,6 +501,7 @@ function KartuPengaturan({ onBukaPengaturan }) {
 
 export default function ProfilData({ onBukaPengaturan, userRole: externalRole, onGantiRole }) {
     const [internalRole, setInternalRole] = useState(externalRole || 'mentee'); // 'mentee' | 'mentor'
+    const [isEditing, setIsEditing] = useState(false);
     const userRole = externalRole ?? internalRole;
 
     const gantiRole = (role) => {
@@ -494,67 +509,16 @@ export default function ProfilData({ onBukaPengaturan, userRole: externalRole, o
         if (onGantiRole) onGantiRole(role);
     };
 
-    // Dipakai bar simulasi: mengatur mode awal Baca/Edit lalu me-remount FormBiodata
-    const [modeSimulasi, setModeSimulasi] = useState('baca');
-    const [kunciReset, setKunciReset] = useState(0);
-
-    const gantiModeBacaEdit = (mode) => {
-        setModeSimulasi(mode);
-        setKunciReset((k) => k + 1);
-    };
-
-    const tombolSimulasi = (aktif) =>
-        `rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${aktif
-            ? 'bg-secondary text-white shadow-sm hover:brightness-110'
-            : 'border border-accent bg-white text-secondary hover:bg-slate-50'
-        }`;
-
     return (
         <div className="bg-lightBg min-h-screen px-4 py-6 md:px-8">
             <div className="max-w-5xl mx-auto space-y-6">
-                {/* ===== BAR SIMULASI PRESENTASI ===== */}
-                <div className="rounded-xl border border-dashed border-accent bg-white px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-2">
-                    <span className="text-xs font-bold text-primary">🛠️ Simulasi Presentasi:</span>
-
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Role</span>
-                        <button
-                            type="button"
-                            onClick={() => gantiRole('mentee')}
-                            className={tombolSimulasi(userRole === 'mentee')}
-                        >
-                            Mentee
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => gantiRole('mentor')}
-                            className={tombolSimulasi(userRole === 'mentor')}
-                        >
-                            Mentor
-                        </button>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Simulasi State</span>
-                        <button
-                            type="button"
-                            onClick={() => gantiModeBacaEdit('baca')}
-                            className={tombolSimulasi(modeSimulasi === 'baca')}
-                        >
-                            Mode Baca
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => gantiModeBacaEdit('edit')}
-                            className={tombolSimulasi(modeSimulasi === 'edit')}
-                        >
-                            Mode Edit
-                        </button>
-                    </div>
-                </div>
-
-                <HeaderProfil userRole={userRole} onGantiRole={gantiRole} />
-                <FormBiodata key={kunciReset} userRole={userRole} initialEditing={modeSimulasi === 'edit'} />
+                <HeaderProfil userRole={userRole} onGantiRole={gantiRole} isEditing={isEditing} />
+                <FormBiodata
+                    userRole={userRole}
+                    isEditing={isEditing}
+                    onStartEdit={() => setIsEditing(true)}
+                    onEndEdit={() => setIsEditing(false)}
+                />
                 <KartuPengaturan onBukaPengaturan={onBukaPengaturan} />
             </div>
         </div>

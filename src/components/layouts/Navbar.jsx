@@ -146,21 +146,27 @@ function SimulationBar({
   payoutFilled,
   setPayoutFilled,
 }) {
+  const isUser = role !== 'admin';
+  const isAdmin = role === 'admin';
+
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-amber-300 bg-amber-100 px-4 py-2 text-xs text-amber-900">
       <span className="font-bold">🛠️ Simulasi Presentasi:</span>
 
       <div className="flex items-center gap-1.5">
         <span className="font-medium">Peran</span>
-        {ROLES.map((item) => (
-          <SimButton
-            key={item.key}
-            active={role === item.key}
-            onClick={() => onRoleChange(item.key)}
-          >
-            {item.label}
-          </SimButton>
-        ))}
+        <SimButton
+          active={isUser}
+          onClick={() => onRoleChange('user')}
+        >
+          User
+        </SimButton>
+        <SimButton
+          active={isAdmin}
+          onClick={() => onRoleChange('admin')}
+        >
+          Admin
+        </SimButton>
       </div>
 
       {role !== 'admin' && (
@@ -459,13 +465,28 @@ export default function Navbar({
   const [notifOpen, setNotifOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [payoutFilled, setPayoutFilled] = useState(true);
+  const [lastUserRole, setLastUserRole] = useState(
+    role === 'mentor' ? 'mentor' : 'mentee'
+  );
+
+  useEffect(() => {
+    if (role === 'mentee' || role === 'mentor') {
+      setLastUserRole(role);
+    }
+  }, [role]);
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const isAdmin = role === 'admin';
-  const items = NAV_ITEMS[role];
-  const home = ROLE_HOME[role];
+  const isAdmin = role === 'admin' || pathname.startsWith('/admin');
+  const isAuthPath =
+    pathname === '/login' ||
+    pathname === '/auth' ||
+    pathname === '/onboarding' ||
+    pathname === '/admin/login';
+
+  const items = NAV_ITEMS[role] || NAV_ITEMS.mentee;
+  const home = ROLE_HOME[role] || ROLE_HOME.mentee;
 
   // Tutup dropdown & menu mobile setiap pindah halaman.
   useEffect(() => {
@@ -473,12 +494,16 @@ export default function Navbar({
     setMobileOpen(false);
   }, [pathname]);
 
-  const handleRoleChange = (nextRole) => {
-    updateRole(nextRole);
+  const handleRoleChange = (targetRole) => {
     setNotifOpen(false);
     setMobileOpen(false);
-    // Pindah ke halaman utama peran baru agar tab aktif langsung terlihat.
-    navigate(ROLE_HOME[nextRole]);
+    if (targetRole === 'admin') {
+      updateRole('admin');
+      navigate('/admin/login');
+    } else {
+      updateRole(lastUserRole || 'mentee');
+      navigate('/login');
+    }
   };
 
   const handleLogout = () => {
@@ -498,7 +523,7 @@ export default function Navbar({
     <header className="relative z-30">
       {showSimulation && (
         <SimulationBar
-          role={role}
+          role={isAdmin ? 'admin' : 'user'}
           onRoleChange={handleRoleChange}
           hasUnread={hasUnread}
           setHasUnread={setHasUnread}
@@ -509,94 +534,81 @@ export default function Navbar({
         />
       )}
 
-      <nav
-        aria-label="Navigasi utama"
-        className={
-          isAdmin
-            ? 'border-b border-slate-200 bg-white'
-            : 'bg-primary'
-        }
-      >
-        <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-4 md:px-8">
-          <Brand isAdmin={isAdmin} home={home} />
+      {/* Navigasi bar utama hanya untuk role User (Mentee/Mentor) dan BUKAN halaman Auth/Admin */}
+      {!isAdmin && !isAuthPath && (
+        <nav
+          aria-label="Navigasi utama"
+          className="bg-primary"
+        >
+          <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-4 md:px-8">
+            <Brand isAdmin={false} home={home} />
 
-          {/* Desktop */}
-          <ul
-            className={`hidden h-full md:flex ${isAdmin ? 'ml-10 mr-auto items-center gap-2' : 'ml-auto mr-8 items-end gap-1'
-              }`}
-          >
-            {items.map((item) => (
-              <TabLink
-                key={item.to}
-                to={item.to}
-                label={item.label}
-                tone={isAdmin ? 'light' : 'dark'}
-              />
-            ))}
-          </ul>
-
-          <div className="hidden items-center gap-3.5 md:flex">
-            {role === 'mentee' && <TopUpButton />}
-            {role === 'mentor' && <PayoutInfo filled={payoutFilled} />}
-            {role !== 'admin' && <NotificationBell {...bellProps} />}
-            {isAdmin && <AdminProfile onLogout={handleLogout} />}
-          </div>
-
-          {/* Mobile */}
-          <div className="flex items-center gap-2 md:hidden">
-            {!isAdmin && <NotificationBell {...bellProps} />}
-            <button
-              type="button"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label={mobileOpen ? 'Tutup menu' : 'Buka menu'}
-              aria-expanded={mobileOpen}
-              className={`grid h-10 w-10 place-items-center rounded-full border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${isAdmin
-                ? 'border-slate-300 text-primary'
-                : 'border-accent/50 text-accent'
-                }`}
-            >
-              {mobileOpen ? (
-                <X className="h-5 w-5" aria-hidden="true" />
-              ) : (
-                <Menu className="h-5 w-5" aria-hidden="true" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {mobileOpen && (
-          <div
-            className={`px-4 pb-5 pt-2 md:hidden ${isAdmin ? 'border-t border-slate-200' : 'border-t border-white/10'
-              }`}
-          >
-            <ul className="flex flex-col gap-1">
+            {/* Desktop Tabs */}
+            <ul className="ml-auto mr-8 hidden h-full items-end gap-1 md:flex">
               {items.map((item) => (
-                <li key={item.to}>
-                  <NavLink
-                    to={item.to}
-                    className={({ isActive }) =>
-                      `block rounded-xl px-4 py-3 text-sm transition-colors ${isActive
-                        ? 'bg-lightBg font-bold text-secondary'
-                        : isAdmin
-                          ? 'font-semibold text-primary hover:bg-lightBg'
-                          : 'font-semibold text-accent hover:bg-white/10'
-                      }`
-                    }
-                  >
-                    {item.label}
-                  </NavLink>
-                </li>
+                <TabLink
+                  key={item.to}
+                  to={item.to}
+                  label={item.label}
+                  tone="dark"
+                />
               ))}
             </ul>
 
-            <div className="mt-4 flex flex-wrap items-center gap-3">
+            <div className="hidden items-center gap-3.5 md:flex">
               {role === 'mentee' && <TopUpButton />}
               {role === 'mentor' && <PayoutInfo filled={payoutFilled} />}
-              {isAdmin && <AdminProfile onLogout={handleLogout} />}
+              <NotificationBell {...bellProps} />
+            </div>
+
+            {/* Mobile */}
+            <div className="flex items-center gap-2 md:hidden">
+              <NotificationBell {...bellProps} />
+              <button
+                type="button"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                aria-label={mobileOpen ? 'Tutup menu' : 'Buka menu'}
+                aria-expanded={mobileOpen}
+                className="grid h-10 w-10 place-items-center rounded-full border border-accent/50 text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                {mobileOpen ? (
+                  <X className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <Menu className="h-5 w-5" aria-hidden="true" />
+                )}
+              </button>
             </div>
           </div>
-        )}
-      </nav>
+
+          {mobileOpen && (
+            <div className="border-t border-white/10 px-4 pb-5 pt-2 md:hidden">
+              <ul className="flex flex-col gap-1">
+                {items.map((item) => (
+                  <li key={item.to}>
+                    <NavLink
+                      to={item.to}
+                      className={({ isActive }) =>
+                        `block rounded-xl px-4 py-3 text-sm transition-colors ${
+                          isActive
+                            ? 'bg-lightBg font-bold text-secondary'
+                            : 'font-semibold text-accent hover:bg-white/10'
+                        }`
+                      }
+                    >
+                      {item.label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                {role === 'mentee' && <TopUpButton />}
+                {role === 'mentor' && <PayoutInfo filled={payoutFilled} />}
+              </div>
+            </div>
+          )}
+        </nav>
+      )}
     </header>
   );
 }

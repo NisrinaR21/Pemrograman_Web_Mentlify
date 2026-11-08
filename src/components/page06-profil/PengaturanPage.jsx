@@ -246,7 +246,6 @@ function FormGantiSandi() {
         <section className="p-6 md:p-8">
             <KepalaSeksi
                 ikon={Lock}
-                eyebrow="SRS-F-AUTH-06"
                 judul="Ganti Kata Sandi"
                 deskripsi="Pastikan akun Anda menggunakan kata sandi yang kuat (minimal 8 karakter, mengandung huruf & angka)."
             />
@@ -489,7 +488,6 @@ function ZonaBahaya({ statusAkun, onBukaModal, onBatalkanPengajuan }) {
         <section className="p-6 md:p-8 border-t border-slate-200">
             <KepalaSeksi
                 ikon={ShieldAlert}
-                eyebrow="SRS-F-ADM-06 • Zona Bahaya"
                 judul="Hapus Akun"
                 deskripsi="Sesuai regulasi UU PDP, menghapus akun akan menganonimisasi data pribadi Anda. Pastikan Anda tidak memiliki sesi bimbingan aktif atau pengaduan konflik yang sedang berjalan."
                 bahaya
@@ -629,7 +627,7 @@ function ModalKonfirmasi({ sesiAktif, onTutup, onKonfirmasi }) {
 export default function PengaturanPage({ onKembali, onKeluar }) {
     const [statusAkun, setStatusAkun] = useState('aktif'); // 'aktif' | 'dihapus'
     const [bukaModalHapus, setBukaModalHapus] = useState(false);
-    const [sesiAktif, setSesiAktif] = useState(false); // simulasi: ada sesi bimbingan aktif
+    const [sesiAktif, setSesiAktif] = useState(false); // ada sesi bimbingan aktif
     const [kunciReset, setKunciReset] = useState(0);
 
     const tutupModal = () => setBukaModalHapus(false);
@@ -649,53 +647,9 @@ export default function PengaturanPage({ onKembali, onKeluar }) {
         setBukaModalHapus(false);
     };
 
-    const resetSimulasi = () => {
-        setStatusAkun('aktif');
-        setBukaModalHapus(false);
-        setSesiAktif(false);
-        setKunciReset((k) => k + 1);
-    };
-
-    const tombolSimulasi = (aktif) =>
-        `rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${aktif
-            ? 'bg-secondary text-white shadow-sm hover:brightness-110'
-            : 'border border-accent bg-white text-secondary hover:bg-slate-50'
-        }`;
-
     return (
         <div className="bg-lightBg min-h-screen px-4 py-6 md:px-8">
             <div className="max-w-5xl mx-auto space-y-6">
-                {/* ===== BAR SIMULASI PRESENTASI ===== */}
-                <div className="rounded-xl border border-dashed border-accent bg-white px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-2">
-                    <span className="text-xs font-bold text-primary">🛠️ Simulasi Presentasi:</span>
-
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pop-up</span>
-                        <button type="button" onClick={() => setBukaModalHapus(true)} className={tombolSimulasi(bukaModalHapus)}>
-                            Modal Hapus
-                        </button>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sesi Bimbingan</span>
-                        <button type="button" onClick={() => setSesiAktif(false)} className={tombolSimulasi(!sesiAktif)}>
-                            Tidak Ada
-                        </button>
-                        <button type="button" onClick={() => setSesiAktif(true)} className={tombolSimulasi(sesiAktif)}>
-                            Ada Sesi Aktif
-                        </button>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <button type="button" onClick={resetSimulasi} className={tombolSimulasi(false)}>
-                            Reset Semua
-                        </button>
-                        <span className="text-[10px] text-slate-400">
-                            Sandi dummy awal: <span className="font-bold text-slate-500">{SANDI_AWAL}</span>
-                        </span>
-                    </div>
-                </div>
-
                 <HeaderPengaturan onKembali={handleKembali} />
 
                 {statusAkun === 'dihapus' && (

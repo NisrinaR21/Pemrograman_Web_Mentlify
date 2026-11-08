@@ -4,6 +4,9 @@ import Navbar from './components/layouts/Navbar.jsx';
 import AuthForm from './components/page01-login/AuthForm.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
+import AdminLoginPage from './components/page08-ADMver/AdminLoginPage.jsx';
+import AdminVerificationPage from './components/page08-ADMver/adminverificationpage.jsx';
+import AdminFinancePage from './components/page08-ADMver/AdminFinancePage.jsx';
 
 function App() {
   const location = useLocation();
@@ -26,28 +29,26 @@ function App() {
     }
   }, [location.pathname]);
 
-  const isAuthPage =
-    location.pathname === '/login' ||
-    location.pathname === '/auth' ||
-    location.pathname === '/onboarding';
-
   const handleLogout = () => {
     navigate('/login');
   };
 
+  const handleRoleChangeFromProfile = (newRole) => {
+    setUserRole(newRole);
+    navigate(`/${newRole}/profil`);
+  };
+
   return (
     <div className="min-h-screen bg-lightBg font-sans">
-      {!isAuthPage && (
-        <Navbar
-          userRole={userRole}
-          setUserRole={setUserRole}
-          onLogout={handleLogout}
-        />
-      )}
+      <Navbar
+        userRole={userRole}
+        setUserRole={setUserRole}
+        onLogout={handleLogout}
+      />
 
       <Routes>
         {/* =========================================
-            1. RUTE AUTENTIKASI (AuthForm)
+            1. RUTE AUTENTIKASI USER (AuthForm)
            ========================================= */}
         <Route path="/login" element={<AuthForm onSuccessLogin={() => navigate('/')} />} />
         <Route path="/auth" element={<AuthForm onSuccessLogin={() => navigate('/')} />} />
@@ -62,17 +63,25 @@ function App() {
         <Route path="/" element={<DashboardPage userRole={userRole} />} />
         <Route path="/mentee/dasbor" element={<DashboardPage userRole="mentee" />} />
         <Route path="/mentor/dasbor" element={<DashboardPage userRole="mentor" />} />
-        <Route path="/admin/verifikasi-mentor" element={<DashboardPage userRole="admin" />} />
 
         {/* =========================================
-            3. RUTE PROFIL & PENGATURAN (ProfilePage)
+            3. RUTE ADMIN (Admin Verification & Finance)
+           ========================================= */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+        <Route path="/admin/verifikasi-mentor" element={<AdminVerificationPage />} />
+        <Route path="/admin/finance" element={<AdminFinancePage />} />
+        <Route path="/admin/keuangan-dispute" element={<AdminFinancePage />} />
+
+        {/* =========================================
+            4. RUTE PROFIL & PENGATURAN (ProfilePage)
            ========================================= */}
         <Route
           path="/profil"
           element={
             <ProfilePage
-              userRole={userRole}
-              setUserRole={setUserRole}
+              userRole={userRole === 'admin' ? 'mentee' : userRole}
+              setUserRole={handleRoleChangeFromProfile}
               onKeluar={handleLogout}
             />
           }
@@ -82,7 +91,7 @@ function App() {
           element={
             <ProfilePage
               userRole="mentee"
-              setUserRole={setUserRole}
+              setUserRole={handleRoleChangeFromProfile}
               onKeluar={handleLogout}
             />
           }
@@ -92,14 +101,14 @@ function App() {
           element={
             <ProfilePage
               userRole="mentor"
-              setUserRole={setUserRole}
+              setUserRole={handleRoleChangeFromProfile}
               onKeluar={handleLogout}
             />
           }
         />
 
         {/* =========================================
-            4. FALLBACK REDIRECT
+            5. FALLBACK REDIRECT
            ========================================= */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
