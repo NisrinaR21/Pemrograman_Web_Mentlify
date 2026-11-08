@@ -451,8 +451,8 @@ function QuestionBuilderModal({ editing, onClose, onSubmit }) {
 /* ------------------------------------------------------------------ */
 /* KOMPONEN UTAMA                                                      */
 /* ------------------------------------------------------------------ */
-function MisiDanKuis({ userRole = 'mentee' }) {
-    const [simRole, setSimRole] = useState(userRole);
+function MisiDanKuis({ userRole = 'mentee', showSimulation = true }) {
+    const role = userRole === 'mentor' ? 'mentor' : 'mentee';
 
     // state mentee
     const [tab, setTab] = useState('proses');
@@ -468,17 +468,12 @@ function MisiDanKuis({ userRole = 'mentee' }) {
 
     const [toast, setToast] = useState('');
 
-    // sinkron jika prop dari parent berubah
-    useEffect(() => {
-        setSimRole(userRole);
-    }, [userRole]);
-
     // tutup modal saat role berganti
     useEffect(() => {
         setQuizOpen(false);
         setBuilderOpen(false);
         setEditingId(null);
-    }, [simRole]);
+    }, [userRole]);
 
     // toast otomatis hilang
     useEffect(() => {
@@ -486,8 +481,6 @@ function MisiDanKuis({ userRole = 'mentee' }) {
         const t = setTimeout(() => setToast(''), 2400);
         return () => clearTimeout(t);
     }, [toast]);
-
-    const role = simRole === 'mentor' ? 'mentor' : 'mentee';
 
     /* ---------- turunan state mentee ---------- */
     const missionXp = missions
@@ -584,94 +577,73 @@ function MisiDanKuis({ userRole = 'mentee' }) {
     return (
         <section className="w-full">
             {/* ---------------- BAR SIMULASI ---------------- */}
-            <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-primary/30 bg-white px-3 py-2">
-                <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
-                    <Wrench size={14} />
-                    🛠️ Simulasi Presentasi:
-                </span>
+            {showSimulation && (
+                <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-primary/30 bg-white px-3 py-2">
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
+                        <Wrench size={14} />
+                        🛠️ Simulasi Presentasi:
+                    </span>
 
-                <span className="text-[11px] font-semibold text-slate-500">Simulasi State</span>
+                    <span className="text-[11px] font-semibold text-slate-500">Simulasi State</span>
 
-                <button
-                    type="button"
-                    onClick={() => setSimRole('mentee')}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${role === 'mentee'
-                            ? 'bg-secondary text-white shadow-sm'
-                            : 'border border-accent bg-white text-secondary hover:bg-slate-50'
-                        }`}
-                >
-                    Role: Mentee
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setSimRole('mentor')}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${role === 'mentor'
-                            ? 'bg-secondary text-white shadow-sm'
-                            : 'border border-accent bg-white text-secondary hover:bg-slate-50'
-                        }`}
-                >
-                    Role: Mentor
-                </button>
-
-                <span className="mx-1 h-4 w-px bg-slate-200" />
-
-                {role === 'mentee' ? (
-                    <>
-                        <button
-                            type="button"
-                            onClick={() => setQuizOpen(true)}
-                            className="rounded-full border border-accent bg-white px-3 py-1 text-xs font-medium text-secondary transition-all duration-200 hover:bg-slate-50"
-                        >
-                            Buka Kuis
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setQuizOpen(false)}
-                            className="rounded-full border border-accent bg-white px-3 py-1 text-xs font-medium text-secondary transition-all duration-200 hover:bg-slate-50"
-                        >
-                            Tutup Kuis
-                        </button>
-                        <button
-                            type="button"
-                            onClick={claimAllMissions}
-                            className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-white shadow-sm transition-all duration-200 hover:brightness-110"
-                        >
-                            Klaim Semua XP
-                        </button>
-                        <button
-                            type="button"
-                            onClick={resetMentee}
-                            className="rounded-full border border-red-400 bg-white px-3 py-1 text-xs font-medium text-red-500 transition-all duration-200 hover:bg-red-50"
-                        >
-                            Reset XP
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <button
-                            type="button"
-                            onClick={() => openBuilder(null)}
-                            className="rounded-full border border-accent bg-white px-3 py-1 text-xs font-medium text-secondary transition-all duration-200 hover:bg-slate-50"
-                        >
-                            Buka Question Builder
-                        </button>
-                        <button
-                            type="button"
-                            onClick={closeBuilder}
-                            className="rounded-full border border-accent bg-white px-3 py-1 text-xs font-medium text-secondary transition-all duration-200 hover:bg-slate-50"
-                        >
-                            Tutup Builder
-                        </button>
-                        <button
-                            type="button"
-                            onClick={resetBank}
-                            className="rounded-full border border-red-400 bg-white px-3 py-1 text-xs font-medium text-red-500 transition-all duration-200 hover:bg-red-50"
-                        >
-                            Reset Bank Soal
-                        </button>
-                    </>
-                )}
-            </div>
+                    {role === 'mentee' ? (
+                        <>
+                            <button
+                                type="button"
+                                onClick={() => setQuizOpen(true)}
+                                className="rounded-full border border-accent bg-white px-3 py-1 text-xs font-medium text-secondary transition-all duration-200 hover:bg-slate-50"
+                            >
+                                Buka Kuis
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setQuizOpen(false)}
+                                className="rounded-full border border-accent bg-white px-3 py-1 text-xs font-medium text-secondary transition-all duration-200 hover:bg-slate-50"
+                            >
+                                Tutup Kuis
+                            </button>
+                            <button
+                                type="button"
+                                onClick={claimAllMissions}
+                                className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-white shadow-sm transition-all duration-200 hover:brightness-110"
+                            >
+                                Klaim Semua XP
+                            </button>
+                            <button
+                                type="button"
+                                onClick={resetMentee}
+                                className="rounded-full border border-red-400 bg-white px-3 py-1 text-xs font-medium text-red-500 transition-all duration-200 hover:bg-red-50"
+                            >
+                                Reset XP
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <button
+                                type="button"
+                                onClick={() => openBuilder(null)}
+                                className="rounded-full border border-accent bg-white px-3 py-1 text-xs font-medium text-secondary transition-all duration-200 hover:bg-slate-50"
+                            >
+                                Buka Question Builder
+                            </button>
+                            <button
+                                type="button"
+                                onClick={closeBuilder}
+                                className="rounded-full border border-accent bg-white px-3 py-1 text-xs font-medium text-secondary transition-all duration-200 hover:bg-slate-50"
+                            >
+                                Tutup Builder
+                            </button>
+                            <button
+                                type="button"
+                                onClick={resetBank}
+                                className="rounded-full border border-red-400 bg-white px-3 py-1 text-xs font-medium text-red-500 transition-all duration-200 hover:bg-red-50"
+                            >
+                                Reset Bank Soal
+                            </button>
+                        </>
+                    )}
+                </div>
+            )}
 
             {/* ================= TAMPILAN MENTEE ================= */}
             {role === 'mentee' && (

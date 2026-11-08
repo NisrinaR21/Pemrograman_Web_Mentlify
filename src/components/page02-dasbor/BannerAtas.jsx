@@ -17,9 +17,6 @@ import {
     Star,
     Users,
     BookOpen,
-    Play,
-    Pause,
-    Wrench,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -209,19 +206,12 @@ function Illustration({ image, art, alt }) {
 /* ------------------------------------------------------------------ */
 /* KOMPONEN UTAMA                                                      */
 /* ------------------------------------------------------------------ */
-function BannerAtas({ userRole = 'mentee' }) {
-    // role dari prop, tetapi bisa di-override oleh bar simulasi
-    const [simRole, setSimRole] = useState(userRole);
+function BannerAtas({ userRole = 'mentee', showSimulation = true }) {
+    const role = userRole === 'mentor' ? 'mentor' : 'mentee';
     const [current, setCurrent] = useState(0);
-    const [autoPlay, setAutoPlay] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
     const [toast, setToast] = useState('');
 
-    // sinkron jika prop dari parent berubah
-    useEffect(() => {
-        setSimRole(userRole);
-    }, [userRole]);
-
-    const role = simRole === 'mentor' ? 'mentor' : 'mentee';
     const slides = SLIDES_DATA[role];
     const total = slides.length;
     const slide = slides[current];
@@ -239,12 +229,12 @@ function BannerAtas({ userRole = 'mentee' }) {
         setCurrent(0);
     }, [role]);
 
-    // autoplay (opsional dari bar simulasi)
+    // autoplay banner otomatis, jeda sejenak saat kursor diarahkan ke banner (hover)
     useEffect(() => {
-        if (!autoPlay) return undefined;
+        if (isHovered) return undefined;
         const timer = setInterval(goNext, 3500);
         return () => clearInterval(timer);
-    }, [autoPlay, goNext]);
+    }, [isHovered, goNext]);
 
     // toast kecil saat CTA diklik
     useEffect(() => {
@@ -259,69 +249,12 @@ function BannerAtas({ userRole = 'mentee' }) {
 
     return (
         <div className="w-full">
-            {/* ---------------- BAR SIMULASI ---------------- */}
-            <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-primary/30 bg-white px-3 py-2">
-                <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
-                    <Wrench size={14} />
-                    🛠️ Simulasi Presentasi:
-                </span>
-
-                <span className="text-[11px] font-semibold text-slate-500">
-                    Simulasi State
-                </span>
-
-                <button
-                    type="button"
-                    onClick={() => setSimRole('mentee')}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${role === 'mentee'
-                            ? 'bg-secondary text-white shadow-sm'
-                            : 'border border-accent bg-white text-secondary hover:bg-slate-50'
-                        }`}
-                >
-                    Role: Mentee
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setSimRole('mentor')}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${role === 'mentor'
-                            ? 'bg-secondary text-white shadow-sm'
-                            : 'border border-accent bg-white text-secondary hover:bg-slate-50'
-                        }`}
-                >
-                    Role: Mentor
-                </button>
-
-                <span className="mx-1 h-4 w-px bg-slate-200" />
-
-                {slides.map((s, i) => (
-                    <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => setCurrent(i)}
-                        className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${current === i
-                                ? 'bg-primary text-white shadow-sm'
-                                : 'border border-accent bg-white text-secondary hover:bg-slate-50'
-                            }`}
-                    >
-                        Slide {i + 1}
-                    </button>
-                ))}
-
-                <button
-                    type="button"
-                    onClick={() => setAutoPlay((v) => !v)}
-                    className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${autoPlay
-                            ? 'bg-[#F9A03F] text-white shadow-sm'
-                            : 'border border-secondary bg-white text-secondary hover:bg-secondary/10'
-                        }`}
-                >
-                    {autoPlay ? <Pause size={12} /> : <Play size={12} />}
-                    Auto-play {autoPlay ? 'ON' : 'OFF'}
-                </button>
-            </div>
-
             {/* ---------------- BANNER CAROUSEL ---------------- */}
-            <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-primary shadow-sm">
+            <div
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className="relative overflow-hidden rounded-3xl border border-primary/30 bg-primary shadow-sm"
+            >
                 <div
                     className="flex transition-transform duration-500 ease-in-out"
                     style={{ transform: `translateX(-${current * 100}%)` }}
@@ -401,8 +334,8 @@ function BannerAtas({ userRole = 'mentee' }) {
                             onClick={() => setCurrent(i)}
                             aria-label={`Ke slide ${i + 1}`}
                             className={`h-2 rounded-full transition-all duration-300 ${current === i
-                                    ? 'w-7 bg-white'
-                                    : 'w-2 bg-white/60 hover:bg-white/80'
+                                ? 'w-7 bg-white'
+                                : 'w-2 bg-white/60 hover:bg-white/80'
                                 }`}
                         />
                     ))}

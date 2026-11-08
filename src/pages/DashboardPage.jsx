@@ -3,9 +3,7 @@ import BannerAtas from '../components/page02-dasbor/BannerAtas.jsx';
 import JadwalHariIni from '../components/page02-dasbor/JadwalHariIni.jsx';
 import MisiDanKuis from '../components/page02-dasbor/MisiDanKuis.jsx';
 
-function DashboardPage() {
-    // State global untuk simulasi role di seluruh Dasbor
-    const [userRole, setUserRole] = useState('mentee');
+function DashboardPage({ userRole = 'mentee', showSimulation = true }) {
 
     return (
         <div className="min-h-screen bg-lightBg pb-12">
@@ -14,7 +12,7 @@ function DashboardPage() {
 
                 {/* Banner Atas (Lebar Penuh) */}
                 <section className="mb-6">
-                    <BannerAtas userRole={userRole} />
+                    <BannerAtas userRole={userRole} showSimulation={showSimulation} />
                 </section>
 
                 {/* Layout Grid Bawah (Kiri & Kanan) */}
@@ -22,12 +20,12 @@ function DashboardPage() {
 
                     {/* Sisi Kiri: Jadwal & Statistik (Lebar ~68%) */}
                     <div className="lg:col-span-8">
-                        <JadwalHariIni userRole={userRole} />
+                        <JadwalHariIni userRole={userRole} showSimulation={showSimulation} />
                     </div>
 
                     {/* Sisi Kanan: Misi & Kuis (Lebar ~32%) */}
                     <div className="lg:col-span-4">
-                        <MisiDanKuis userRole={userRole} />
+                        <MisiDanKuis userRole={userRole} showSimulation={showSimulation} />
                     </div>
 
                 </div>

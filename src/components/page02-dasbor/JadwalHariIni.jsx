@@ -160,7 +160,7 @@ function EmptyState({ role, data, onAction }) {
 /* ------------------------------------------------------------------ */
 /* KARTU SESI (TERJADWAL & 15 MENIT)                                   */
 /* ------------------------------------------------------------------ */
-function SessionCard({ role, data, kondisi, hadir, onHadir, onSimulate, onToast }) {
+function SessionCard({ role, data, kondisi, hadir, onHadir, onToast }) {
     const { person, session, banner } = data;
     const isLive = kondisi === '15menit';
     const isLatihan = banner.type === 'latihan';
@@ -314,18 +314,9 @@ function SessionCard({ role, data, kondisi, hadir, onHadir, onSimulate, onToast 
                         )}
                     </>
                 ) : (
-                    <>
-                        <button type="button" disabled className={BTN_DISABLED}>
-                            Ruang Sesi Belum Dibuka
-                        </button>
-                        <button
-                            type="button"
-                            onClick={onSimulate}
-                            className="text-sm text-secondary underline transition-all duration-200 hover:opacity-90"
-                        >
-                            Simulasikan H-15 menit
-                        </button>
-                    </>
+                    <button type="button" disabled className={BTN_DISABLED}>
+                        Ruang Sesi Belum Dibuka
+                    </button>
                 )}
             </div>
         </div>
@@ -365,21 +356,16 @@ function StatCards({ stats }) {
 /* ------------------------------------------------------------------ */
 /* KOMPONEN UTAMA                                                      */
 /* ------------------------------------------------------------------ */
-function JadwalHariIni({ userRole = 'mentee' }) {
-    const [simRole, setSimRole] = useState(userRole);
+function JadwalHariIni({ userRole = 'mentee', showSimulation = true }) {
+    const role = userRole === 'mentor' ? 'mentor' : 'mentee';
     const [kondisiJadwal, setKondisiJadwal] = useState('kosong');
     const [hadir, setHadir] = useState(false);
     const [toast, setToast] = useState('');
 
-    // sinkron jika prop dari parent berubah
-    useEffect(() => {
-        setSimRole(userRole);
-    }, [userRole]);
-
     // reset status hadir saat kondisi atau role berganti
     useEffect(() => {
         setHadir(false);
-    }, [kondisiJadwal, simRole]);
+    }, [kondisiJadwal, userRole]);
 
     // toast otomatis hilang
     useEffect(() => {
@@ -388,7 +374,6 @@ function JadwalHariIni({ userRole = 'mentee' }) {
         return () => clearTimeout(t);
     }, [toast]);
 
-    const role = simRole === 'mentor' ? 'mentor' : 'mentee';
     const data = ROLE_DATA[role];
 
     const handleHadir = () => {
@@ -399,53 +384,32 @@ function JadwalHariIni({ userRole = 'mentee' }) {
     return (
         <section className="w-full">
             {/* ---------------- BAR SIMULASI ---------------- */}
-            <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-primary/30 bg-white px-3 py-2">
-                <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
-                    <Wrench size={14} />
-                    🛠️ Simulasi Presentasi:
-                </span>
+            {showSimulation && (
+                <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-primary/30 bg-white px-3 py-2">
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
+                        <Wrench size={14} />
+                        🛠️ Simulasi Presentasi:
+                    </span>
 
-                <span className="text-[11px] font-semibold text-slate-500">
-                    Simulasi State
-                </span>
+                    <span className="text-[11px] font-semibold text-slate-500">
+                        Simulasi State
+                    </span>
 
-                <button
-                    type="button"
-                    onClick={() => setSimRole('mentee')}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${role === 'mentee'
-                        ? 'bg-secondary text-white shadow-sm'
-                        : 'border border-accent bg-white text-secondary hover:bg-slate-50'
-                        }`}
-                >
-                    Role: Mentee
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setSimRole('mentor')}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${role === 'mentor'
-                        ? 'bg-secondary text-white shadow-sm'
-                        : 'border border-accent bg-white text-secondary hover:bg-slate-50'
-                        }`}
-                >
-                    Role: Mentor
-                </button>
-
-                <span className="mx-1 h-4 w-px bg-slate-200" />
-
-                {KONDISI_OPTIONS.map((opt) => (
-                    <button
-                        key={opt.key}
-                        type="button"
-                        onClick={() => setKondisiJadwal(opt.key)}
-                        className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${kondisiJadwal === opt.key
-                            ? 'bg-primary text-white shadow-sm'
-                            : 'border border-accent bg-white text-secondary hover:bg-slate-50'
-                            }`}
-                    >
-                        Jadwal: {opt.label}
-                    </button>
-                ))}
-            </div>
+                    {KONDISI_OPTIONS.map((opt) => (
+                        <button
+                            key={opt.key}
+                            type="button"
+                            onClick={() => setKondisiJadwal(opt.key)}
+                            className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${kondisiJadwal === opt.key
+                                ? 'bg-primary text-white shadow-sm'
+                                : 'border border-accent bg-white text-secondary hover:bg-slate-50'
+                                }`}
+                        >
+                            Jadwal: {opt.label}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             {/* ---------------- JUDUL ---------------- */}
             <h2 className="mb-3 text-lg font-bold text-primary">Jadwal Hari Ini</h2>
@@ -465,7 +429,6 @@ function JadwalHariIni({ userRole = 'mentee' }) {
                         kondisi={kondisiJadwal}
                         hadir={hadir}
                         onHadir={handleHadir}
-                        onSimulate={() => setKondisiJadwal('15menit')}
                         onToast={setToast}
                     />
                 )}
