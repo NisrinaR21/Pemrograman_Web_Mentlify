@@ -1,5 +1,6 @@
 // src/components/page04-cari-mentor/CariMentorPage.jsx
 import { useState, useMemo, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
     Search,
     ChevronDown,
@@ -894,7 +895,7 @@ function ModalDetailMentor({ mentor, hariFilter, saldoUtama, initialSukses = fal
                             {!saldoCukup && (
                                 <p className="mt-3 text-sm font-semibold text-red-500 flex items-center gap-1.5">
                                     <AlertCircle size={14} />
-                                    Saldo utama tidak cukup. Lakukan Top Up terlebih dahulu.
+                                    Saldo utama tidak cukup. Lakukan <Link to="/top-up" className="underline font-bold hover:text-red-700">Top Up</Link> terlebih dahulu.
                                 </p>
                             )}
 

@@ -291,10 +291,14 @@ function TabLink({ to, label, tone }) {
   );
 }
 
-function TopUpButton() {
+function TopUpButton({ role = 'mentee' }) {
+  const location = useLocation();
+  const isMentor = role === 'mentor' || location.pathname.startsWith('/mentor');
+  const target = isMentor ? '/mentor/dompet' : '/mentee/top-up';
+
   return (
     <Link
-      to="/mentee/top-up"
+      to={target}
       className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-accentYellow px-4 py-1.5 text-xs font-bold text-[#5A3A00] shadow-sm transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
     >
       Top Up +
@@ -556,8 +560,13 @@ export default function Navbar({
             </ul>
 
             <div className="hidden items-center gap-3.5 md:flex">
-              {role === 'mentee' && <TopUpButton />}
-              {role === 'mentor' && <PayoutInfo filled={payoutFilled} />}
+              {role === 'mentee' && <TopUpButton role={role} />}
+              {role === 'mentor' && (
+                <>
+                  <TopUpButton role={role} />
+                  <PayoutInfo filled={payoutFilled} />
+                </>
+              )}
               <NotificationBell {...bellProps} />
             </div>
 
@@ -602,8 +611,13 @@ export default function Navbar({
               </ul>
 
               <div className="mt-4 flex flex-wrap items-center gap-3">
-                {role === 'mentee' && <TopUpButton />}
-                {role === 'mentor' && <PayoutInfo filled={payoutFilled} />}
+                {role === 'mentee' && <TopUpButton role={role} />}
+                {role === 'mentor' && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <TopUpButton role={role} />
+                    <PayoutInfo filled={payoutFilled} />
+                  </div>
+                )}
               </div>
             </div>
           )}

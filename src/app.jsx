@@ -10,6 +10,7 @@ import AdminFinancePage from './components/page08-ADMver/AdminFinancePage.jsx';
 import CariMentorPage from './components/page03-CariMentor/CariMentorPage.jsx';
 import JadwalSesiPage from './pages/JadwalSesiPage.jsx';
 import RatingPage from './pages/RatingPage.jsx';
+import DompetPage from './pages/DompetPage.jsx'; // 1. Tambahkan import DompetPage
 
 function App() {
   const location = useLocation();
@@ -139,7 +140,20 @@ function App() {
         />
 
         {/* =========================================
-            8. FALLBACK REDIRECT
+            8. RUTE DOMPET KOIN & TOP UP (Mentee & Mentor)
+           ========================================= */}
+        <Route path="/dompet" element={<DompetPage userRole={userRole} />} />
+        <Route path="/mentee/dompet" element={<DompetPage userRole="mentee" />} />
+        <Route path="/mentor/dompet" element={<DompetPage userRole="mentor" />} />
+        <Route path="/top-up" element={<DompetPage userRole={userRole} />} />
+        <Route path="/topup" element={<DompetPage userRole={userRole} />} />
+        <Route path="/mentee/top-up" element={<DompetPage userRole="mentee" />} />
+        <Route path="/mentor/top-up" element={<DompetPage userRole="mentor" />} />
+        <Route path="/payout" element={<DompetPage userRole="mentor" />} />
+        <Route path="/mentor/payout" element={<DompetPage userRole="mentor" />} />
+
+        {/* =========================================
+            9. FALLBACK REDIRECT
            ========================================= */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
