@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import {
+  AlertCircle,
   ArrowUpRight,
   Check,
   CheckCircle2,
@@ -7,19 +8,32 @@ import {
   Clock,
   Eye,
   EyeOff,
+  FileCheck,
+  FileText,
   GraduationCap,
+  Hourglass,
   Lock,
   Mail,
   RotateCcw,
   Sparkles,
   Star,
+  Trash2,
+  UploadCloud,
+  X,
 } from 'lucide-react';
-
 import logoWhite from '../../assets/logo-white.png';
 import logoBiru from '../../assets/logo-biru.png';
 
-const LOCK_DURATION = 14 * 60 + 59; // tampil mulai 14:59
+/* ------------------------------------------------------------------ */
+/*  Konfigurasi & data dummy                                           */
+/* ------------------------------------------------------------------ */
+
+const LOCK_DURATION = 14 * 60 + 59; // 14:59
 const RESEND_DURATION = 59; // detik
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_ATTEMPTS = 3;
+const SAMPLE_FILE_SIZE = 2516582; // ≈ 2.4 MB
+const SAMPLE_SUBMISSION = { id: '#MTL-2025-0842', sentAt: '24 Mei 2025, 10.32 WIB' };
 
 const FAKULTAS_DATA = {
   'Fakultas Teknik dan Teknologi Kemaritiman': [
@@ -127,21 +141,63 @@ const SAMPLE_REGISTER_DATA = {
   },
 };
 
+const DEFAULT_APPLICANT = {
+  nama: 'Nadia Putri',
+  email: 'nadia.putri@umrah.ac.id',
+  mentorStatus: 'mahasiswa',
+};
+
+const DOCUMENT_TYPES = {
+  mahasiswa: {
+    label: 'Mahasiswa Aktif',
+    uploadTitle: 'Unggah KTM / Surat Aktif',
+    shortName: 'KTM / Surat Aktif',
+    filePrefix: 'KTM',
+    fileSuffix: 'Semester6',
+  },
+  alumni: {
+    label: 'Alumni',
+    uploadTitle: 'Unggah Ijazah / SKL',
+    shortName: 'Ijazah / SKL',
+    filePrefix: 'Ijazah',
+    fileSuffix: '2024',
+  },
+};
+
+const STEP_DEFINITIONS = [
+  { id: 1, label: 'Data Diri' },
+  { id: 2, label: 'Unggah Dokumen' },
+  { id: 3, label: 'Review Admin' },
+];
+
+const REJECTION_REASONS = [
+  {
+    judul: 'Dokumen buram',
+    catatan: 'Pastikan seluruh tulisan terlihat jelas dan tidak terpotong.',
+  },
+  {
+    judul: 'Dokumen tidak sesuai',
+    catatan: 'Unggah KTM atau surat aktif kuliah yang masih berlaku.',
+  },
+  {
+    judul: 'Data tidak cocok',
+    catatan: 'Nama pada dokumen harus sama dengan nama yang kamu daftarkan.',
+  },
+];
+
 /* ------------------------------------------------------------------ */
 /*  Kelas Tailwind yang dipakai ulang                                  */
 /* ------------------------------------------------------------------ */
 
+const EYEBROW = 'text-xs font-bold uppercase tracking-[0.18em] text-secondary';
 const INPUT_BASE =
-  'w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm placeholder:text-slate-400 transition-all duration-200 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400';
-const INPUT_CLASS = `${INPUT_BASE} text-primary`;
-
+  'w-full rounded-2xl border border-accent bg-white px-4 py-3 text-sm font-medium text-primary outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-secondary focus:ring-4 focus:ring-secondary/10';
+const INPUT_CLASS = INPUT_BASE;
 const PRIMARY_BUTTON =
   'flex w-full items-center justify-center gap-2 rounded-full bg-secondary px-4 py-4 text-base font-medium text-white shadow-lg shadow-secondary/30 transition-all duration-200 hover:brightness-110 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:hover:brightness-100';
 
-const EYEBROW = 'text-xs font-bold uppercase tracking-[0.18em] text-secondary';
-
 /* ------------------------------------------------------------------ */
-/*  Helper kecil                                                       */
+/*  Helper umum                                                        */
 /* ------------------------------------------------------------------ */
 
 function formatTime(totalSeconds) {
@@ -150,7 +206,66 @@ function formatTime(totalSeconds) {
   return `${minutes}:${seconds}`;
 }
 
-function Logo({ variant }) {
+function formatFileSize(bytes) {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
+function getFileExtension(fileName) {
+  const parts = fileName.split('.');
+  return parts.length > 1 ? parts.pop().toUpperCase() : 'FILE';
+}
+
+function getInitials(fullName) {
+  return fullName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0].toUpperCase())
+    .join('');
+}
+
+function getFirstName(fullName) {
+  return fullName.split(' ').filter(Boolean)[0] || 'Mentor';
+}
+
+function formatSentAt(date) {
+  const day = new Intl.DateTimeFormat('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Asia/Jakarta',
+  }).format(date);
+  const time = new Intl.DateTimeFormat('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Asia/Jakarta',
+  })
+    .format(date)
+    .replace(':', '.');
+  return `${day}, ${time} WIB`;
+}
+
+function createSubmissionId() {
+  const year = new Date().getFullYear();
+  const serial = Math.floor(1000 + Math.random() * 9000);
+  return `#MTL-${year}-${serial}`;
+}
+
+function getStepStates(approvalStatus) {
+  if (approvalStatus === 'belum_unggah') return ['done', 'active', 'pending'];
+  if (approvalStatus === 'disetujui') return ['done', 'done', 'done'];
+  return ['done', 'done', 'active']; // menunggu & ditolak
+}
+
+function getStepCaption(stepIndex, state) {
+  if (state === 'done') return 'Selesai';
+  if (state === 'pending') return 'Pending';
+  return stepIndex === 1 ? 'Aktif' : 'Berjalan';
+}
+
+export function Logo({ variant }) {
   const isWhite = variant === 'white';
   const imageSrc = isWhite ? logoWhite : logoBiru;
 
@@ -161,14 +276,16 @@ function Logo({ variant }) {
   return (
     <div className="flex items-center gap-2.5">
       <span
-        className={`flex h-10 w-10 items-center justify-center rounded-full text-xl font-extrabold ${isWhite ? 'bg-white text-secondary' : 'bg-secondary text-white'
-          }`}
+        className={`flex h-10 w-10 items-center justify-center rounded-full text-xl font-extrabold ${
+          isWhite ? 'bg-white text-secondary' : 'bg-secondary text-white'
+        }`}
       >
         M
       </span>
       <span
-        className={`text-3xl font-extrabold tracking-tight ${isWhite ? 'text-white' : 'text-secondary'
-          }`}
+        className={`text-3xl font-extrabold tracking-tight ${
+          isWhite ? 'text-white' : 'text-secondary'
+        }`}
       >
         Mentlify
       </span>
@@ -192,11 +309,7 @@ function Field({ label, htmlFor, error, hint, children }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Bar simulasi presentasi                                            */
-/* ------------------------------------------------------------------ */
-
-function SimulationBar({ items, showFillSample, onFillSample }) {
+export function SimulationBar({ items, showFillSample, onFillSample }) {
   const [open, setOpen] = useState(true);
 
   return (
@@ -211,7 +324,9 @@ function SimulationBar({ items, showFillSample, onFillSample }) {
         >
           Simulasi State
           <ChevronDown
-            className={`h-3.5 w-3.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+            className={`h-3.5 w-3.5 transition-transform duration-200 ${
+              open ? 'rotate-180' : ''
+            }`}
           />
         </button>
 
@@ -221,10 +336,11 @@ function SimulationBar({ items, showFillSample, onFillSample }) {
               key={item.key}
               type="button"
               onClick={item.onClick}
-              className={`rounded-full px-3 py-1 font-semibold transition-all duration-200 ${item.active
-                  ? 'bg-accent text-primary'
-                  : 'bg-white/10 text-white hover:bg-white/20'
-                }`}
+              className={`rounded-full px-3 py-1 transition-all duration-200 ${
+                item.active
+                  ? 'bg-accent text-primary font-bold shadow-sm'
+                  : 'bg-white/10 text-white/90 hover:bg-white/20'
+              }`}
             >
               {item.label}
             </button>
@@ -234,9 +350,9 @@ function SimulationBar({ items, showFillSample, onFillSample }) {
           <button
             type="button"
             onClick={onFillSample}
-            className="rounded-full border border-accent px-3 py-1 font-semibold text-accent transition-all duration-200 hover:bg-accent/10"
+            className="ml-auto rounded-full bg-accent/20 px-3 py-1 font-semibold text-accent transition-all duration-200 hover:bg-accent/30"
           >
-            Isi Data Contoh
+            Isi Contoh
           </button>
         )}
       </div>
@@ -255,76 +371,66 @@ function LoginPage({
   setShowPassword,
   locked,
   lockSeconds,
-  onToggleLock,
   onSubmit,
   onGoRegister,
   onForgotPassword,
 }) {
   return (
-    <div className="grid flex-1 md:grid-cols-2">
-      {/* Panel kiri (tetap) */}
-      <aside className="relative m-3 hidden overflow-hidden rounded-3xl bg-gradient-to-br from-secondary via-secondary to-primary p-8 text-white md:flex md:flex-col lg:p-12">
+    <div className="grid flex-1 md:grid-cols-[38%_1fr]">
+      {/* Panel kiri (branding) */}
+      <aside className="relative hidden overflow-hidden bg-gradient-to-br from-[#1C4E80] to-[#0D2847] p-8 text-white md:flex md:flex-col lg:p-12">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-28 -top-32 h-[340px] w-[340px] rounded-full border border-white/20"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-10 -top-16 h-[220px] w-[220px] rounded-full border border-white/20"
+          className="pointer-events-none absolute -left-12 -top-12 h-64 w-64 rounded-full bg-secondary/20 blur-3xl"
         />
 
         <div className="relative">
           <Logo variant="white" />
-
           <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-3.5 py-1.5 text-xs font-semibold backdrop-blur-sm">
             <Sparkles className="h-3.5 w-3.5" />
             Belajar lintas kampus, tumbuh bersama
           </div>
 
-          <h1 className="mt-8 text-4xl font-extrabold leading-[1.05] tracking-tight lg:text-5xl xl:text-[64px]">
-            Tingkatkan
-            <br />
-            Potensimu
+          <h1 className="mt-8 text-3xl font-extrabold leading-[1.1] tracking-tight lg:text-4xl xl:text-5xl">
+            Belajar Lebih Dekat
             <br />
             Bersama Mentor
             <br />
             Antar-Kampus
           </h1>
 
-          <p className="mt-6 max-w-[470px] text-base leading-relaxed text-white/85">
-            Terhubung dengan mentor berpengalaman dan capai target akademikmu melalui sesi
-            belajar yang personal.
+          <p className="mt-6 max-w-[380px] text-sm leading-relaxed text-white/80">
+            Terhubung dengan mentor berpengalaman dan capai target akademikmu melalui sesi belajar
+            yang personal.
           </p>
         </div>
 
-        <div className="relative mt-auto pt-10">
-          <figure className="max-w-[476px] rounded-2xl border border-white/25 bg-white/15 p-6 backdrop-blur-sm">
-            <div className="flex gap-1" aria-label={`Rating ${TESTIMONIAL.rating} dari 5`}>
-              {Array.from({ length: TESTIMONIAL.rating }).map((_, index) => (
-                <Star key={index} className="h-4 w-4 fill-accentYellow text-accentYellow" />
-              ))}
+        {/* Kartu testimonial */}
+        <div className="relative z-10 mt-auto rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-md">
+          <div className="flex gap-1 text-accentYellow">
+            {Array.from({ length: TESTIMONIAL.rating }).map((_, i) => (
+              <Star key={i} className="h-4 w-4 fill-current" />
+            ))}
+          </div>
+          <p className="mt-3 text-xs leading-relaxed text-white/90">{TESTIMONIAL.quote}</p>
+          <div className="mt-4 flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-xs font-bold">
+              {TESTIMONIAL.initials}
+            </span>
+            <div>
+              <p className="text-xs font-bold">{TESTIMONIAL.name}</p>
+              <p className="text-[11px] text-white/70">{TESTIMONIAL.role}</p>
             </div>
-            <blockquote className="mt-4 text-sm leading-relaxed text-white">
-              {TESTIMONIAL.quote}
-            </blockquote>
-            <figcaption className="mt-5 flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-accent bg-lightBg text-sm font-bold text-secondary">
-                {TESTIMONIAL.initials}
-              </span>
-              <span>
-                <span className="block text-sm font-bold">{TESTIMONIAL.name}</span>
-                <span className="block text-xs text-white/75">{TESTIMONIAL.role}</span>
-              </span>
-            </figcaption>
-          </figure>
-
-          <div className="absolute bottom-2 right-0 flex h-16 w-16 rotate-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
-            <GraduationCap className="h-7 w-7" />
           </div>
         </div>
+
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-16 -right-16 h-48 w-48 rounded-full bg-accent/30 blur-2xl"
+        />
       </aside>
 
-      {/* Panel kanan (berganti) */}
+      {/* Panel kanan (form) */}
       <main className="flex items-center justify-center px-6 py-12 md:px-10 lg:px-16">
         <div className="w-full max-w-[476px]">
           <div className="mb-8 md:hidden">
@@ -335,25 +441,24 @@ function LoginPage({
           <h2 className="mt-2 text-4xl font-extrabold tracking-tight text-primary">
             Selamat Datang Kembali
           </h2>
-          <p className="mt-2 text-sm text-primary/70">Masuk untuk melanjutkan perjalanan belajarmu.</p>
+          <p className="mt-2 text-sm text-primary/70">
+            Masuk untuk mengakses jadwal sesi, materi belajar, dan profil mentormu.
+          </p>
 
           {locked && (
             <div
               role="alert"
-              className="mt-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4"
+              className="mt-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-700"
             >
-              <Lock className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
-              <div className="flex-1">
-                <p className="text-sm font-bold text-red-500">
-                  Akun terkunci sementara karena 5 kali percobaan gagal
-                </p>
-                <p className="mt-0.5 text-xs text-red-500/80">
-                  Coba kembali setelah hitung mundur selesai.
+              <Lock className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+              <div>
+                <p className="font-bold">Akun Dikunci Sementara</p>
+                <p className="mt-0.5 text-red-600">
+                  Terlalu banyak percobaan login gagal. Silakan tunggu{' '}
+                  <span className="font-bold text-red-700">{formatTime(lockSeconds)}</span> sebelum
+                  mencoba lagi.
                 </p>
               </div>
-              <span className="shrink-0 rounded-full bg-red-500 px-3 py-1 text-xs font-bold tabular-nums text-white">
-                {formatTime(lockSeconds)}
-              </span>
             </div>
           )}
 
@@ -364,10 +469,10 @@ function LoginPage({
                 type="email"
                 autoComplete="email"
                 placeholder="nama@kampus.ac.id"
-                value={form.email}
                 disabled={locked}
-                onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
-                className={INPUT_CLASS}
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className={`${INPUT_CLASS} ${locked ? 'cursor-not-allowed bg-slate-100' : ''}`}
               />
             </Field>
 
@@ -378,41 +483,37 @@ function LoginPage({
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   placeholder="Masukkan kata sandi"
-                  value={form.password}
                   disabled={locked}
-                  onChange={(event) =>
-                    setForm((prev) => ({ ...prev, password: event.target.value }))
-                  }
-                  className={`${INPUT_CLASS} pr-12`}
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  className={`${INPUT_CLASS} pr-12 ${locked ? 'cursor-not-allowed bg-slate-100' : ''}`}
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
                   aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-secondary"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </Field>
 
-            <div className="flex items-center justify-between">
-              <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary">
+            <div className="flex items-center justify-between text-xs">
+              <label className="flex items-center gap-2 font-medium text-primary/80">
                 <input
                   type="checkbox"
                   checked={form.remember}
-                  disabled={locked}
-                  onChange={(event) =>
-                    setForm((prev) => ({ ...prev, remember: event.target.checked }))
-                  }
-                  className="h-4 w-4 rounded border-slate-300 accent-secondary"
+                  onChange={(e) => setForm({ ...form, remember: e.target.checked })}
+                  className="h-4 w-4 rounded border-accent text-secondary focus:ring-secondary/20"
                 />
                 Ingat Saya
               </label>
+
               <button
                 type="button"
                 onClick={onForgotPassword}
-                className="text-sm font-medium text-secondary transition-all duration-200 hover:underline"
+                className="font-semibold text-secondary hover:underline"
               >
                 Lupa Kata Sandi?
               </button>
@@ -420,7 +521,7 @@ function LoginPage({
 
             <button type="submit" disabled={locked} className={PRIMARY_BUTTON}>
               Masuk Sekarang
-              <ArrowUpRight className="h-4 w-4" />
+              <ArrowUpRight className="h-5 w-5" />
             </button>
           </form>
 
@@ -462,11 +563,10 @@ function RegisterPage({
 
   return (
     <div className="grid flex-1 md:grid-cols-[38%_1fr]">
-      {/* Panel kiri (tetap) */}
+      {/* Panel kiri (branding) */}
       <aside className="relative hidden overflow-hidden bg-lightBg p-8 md:flex md:flex-col lg:p-12">
         <div className="relative z-10">
           <Logo variant="color" />
-
           <span className="mt-8 inline-block rounded-full border border-accent bg-white px-3.5 py-1.5 text-xs font-semibold text-secondary">
             Mulai dari sini
           </span>
@@ -506,7 +606,7 @@ function RegisterPage({
         </div>
       </aside>
 
-      {/* Panel kanan (berganti) */}
+      {/* Panel kanan (form) */}
       <main className="flex items-center justify-center bg-white px-6 py-12 md:px-8 lg:px-14">
         <div className="w-full max-w-[612px]">
           <div className="mb-8 md:hidden">
@@ -534,10 +634,11 @@ function RegisterPage({
                 role="tab"
                 aria-selected={role === tab.value}
                 onClick={() => setRole(tab.value)}
-                className={`rounded-full py-3 text-base font-medium transition-all duration-200 ${role === tab.value
+                className={`rounded-full py-3 text-base font-medium transition-all duration-200 ${
+                  role === tab.value
                     ? 'bg-white text-secondary shadow-md'
                     : 'text-slate-500 hover:text-primary'
-                  }`}
+                }`}
               >
                 {tab.label}
               </button>
@@ -563,14 +664,16 @@ function RegisterPage({
                         role="radio"
                         aria-checked={selected}
                         onClick={() => setMentorStatus(option.value)}
-                        className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all duration-200 ${selected
+                        className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all duration-200 ${
+                          selected
                             ? 'border-secondary bg-lightBg font-medium text-secondary'
                             : 'border-slate-200 bg-white text-slate-500 hover:border-accent'
-                          }`}
+                        }`}
                       >
                         <span
-                          className={`h-2 w-2 rounded-full ${selected ? 'bg-secondary' : 'bg-slate-300'
-                            }`}
+                          className={`h-2 w-2 rounded-full ${
+                            selected ? 'bg-secondary' : 'bg-slate-300'
+                          }`}
                         />
                         {option.label}
                       </button>
@@ -648,6 +751,7 @@ function RegisterPage({
                 </div>
               </Field>
 
+              {/* Baris 3: Email */}
               <div className="sm:col-span-2">
                 <Field
                   label="Email"
@@ -674,6 +778,7 @@ function RegisterPage({
                 )}
               </div>
 
+              {/* Kata Sandi & Konfirmasi Password */}
               <Field label="Kata Sandi" htmlFor="reg-password" error={errors.password}>
                 <input
                   id="reg-password"
@@ -686,7 +791,11 @@ function RegisterPage({
                 />
               </Field>
 
-              <Field label="Konfirmasi Password" htmlFor="reg-konfirmasi" error={errors.konfirmasi}>
+              <Field
+                label="Konfirmasi Password"
+                htmlFor="reg-konfirmasi"
+                error={errors.konfirmasi}
+              >
                 <input
                   id="reg-konfirmasi"
                   type="password"
@@ -705,49 +814,56 @@ function RegisterPage({
                 return (
                   <li
                     key={rule.id}
-                    className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-all duration-200 ${passed
-                        ? 'border-accent bg-accent/10 text-secondary'
-                        : 'border-slate-200 bg-slate-50 text-slate-500'
-                      }`}
+                    className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                      passed
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-slate-100 text-slate-500'
+                    }`}
                   >
-                    {passed ? (
-                      <Check className="h-3 w-3" strokeWidth={3} />
-                    ) : (
-                      <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-                    )}
+                    <Check
+                      className={`h-3 w-3 ${passed ? 'text-emerald-600' : 'text-slate-400'}`}
+                    />
                     {rule.label}
                   </li>
                 );
               })}
             </ul>
 
-            <label className="mt-5 flex cursor-pointer items-center gap-3 text-sm text-primary">
+            <div className="mt-6 flex items-start gap-3">
               <input
+                id="reg-agree"
                 type="checkbox"
                 checked={agree}
-                onChange={(event) => setAgree(event.target.checked)}
-                className="h-4 w-4 shrink-0 rounded border-slate-300 accent-secondary"
+                onChange={(e) => setAgree(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-accent text-secondary focus:ring-secondary/20"
               />
-              <span>
-                Saya menyetujui <span className="font-bold text-secondary">Syarat &amp; Ketentuan</span>{' '}
-                serta Kebijakan Privasi Mentlify.
-              </span>
-            </label>
+              <label htmlFor="reg-agree" className="text-xs leading-relaxed text-primary/80">
+                Saya menyetujui{' '}
+                <a href="#terms" className="font-semibold text-secondary hover:underline">
+                  Syarat &amp; Ketentuan
+                </a>{' '}
+                serta{' '}
+                <a href="#privacy" className="font-semibold text-secondary hover:underline">
+                  Kebijakan Privasi
+                </a>{' '}
+                Mentlify.
+              </label>
+            </div>
 
-            <button type="submit" disabled={!agree} className={`${PRIMARY_BUTTON} mt-4`}>
-              Daftar Akun
-              <ArrowUpRight className="h-4 w-4" />
+            <button type="submit" disabled={!agree} className={`${PRIMARY_BUTTON} mt-6`}>
+              Daftar Sekarang
+              <ArrowUpRight className="h-5 w-5" />
             </button>
           </form>
 
-          <p className="mt-5 text-center text-sm text-primary/70">
-            Sudah punya akun?{' '}
+          <p className="mt-6 text-center text-sm text-primary/70">
+            Sudah memiliki akun?{' '}
             <button
               type="button"
               onClick={onGoLogin}
-              className="font-medium text-secondary transition-all duration-200 hover:underline"
+              className="font-medium text-secondary hover:underline"
             >
-              Masuk sekarang
+              Masuk di sini
             </button>
           </p>
         </div>
@@ -760,7 +876,18 @@ function RegisterPage({
 /*  Halaman Verifikasi Email                                           */
 /* ------------------------------------------------------------------ */
 
-function VerificationPage({ status, email, resendSeconds, onResend, onExpire, onOpenMail }) {
+function VerificationPage({
+  status,
+  email,
+  resendSeconds,
+  role,
+  onResend,
+  onExpire,
+  onOpenMail,
+  onProceedOnboarding,
+}) {
+  const isMentor = role === 'mentor';
+
   return (
     <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-lightBg px-4 py-12">
       <div
@@ -788,14 +915,13 @@ function VerificationPage({ status, email, resendSeconds, onResend, onExpire, on
         </h1>
         <p className="mt-5 text-sm leading-relaxed text-primary/80">
           Kami telah mengirimkan tautan verifikasi ke <strong className="text-primary">{email}</strong>.
-          <br />
-          Tautan berlaku selama 24 jam.
+          Klik tautan tersebut untuk mengaktifkan akun Anda.
         </p>
 
         {status === 'sent' && (
           <div
             role="status"
-            className="mt-7 flex items-center justify-center gap-2 rounded-xl border border-accent bg-accent/20 px-4 py-3.5 text-sm font-bold text-secondary"
+            className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-800"
           >
             <CheckCircle2 className="h-4 w-4" />
             Tautan baru berhasil dikirim.
@@ -857,34 +983,456 @@ function VerificationPage({ status, email, resendSeconds, onResend, onExpire, on
 }
 
 /* ------------------------------------------------------------------ */
-/*  Komponen utama                                                     */
+/*  Bagian-bagian Onboarding Mentor                                    */
+/* ------------------------------------------------------------------ */
+
+function Stepper({ approvalStatus }) {
+  const states = getStepStates(approvalStatus);
+
+  return (
+    <ol className="mx-auto grid w-full max-w-[866px] grid-cols-3">
+      {STEP_DEFINITIONS.map((step, index) => {
+        const state = states[index];
+        const isDone = state === 'done';
+        const isActive = state === 'active';
+
+        return (
+          <li key={step.id} className="relative flex flex-col items-center">
+            {index < STEP_DEFINITIONS.length - 1 && (
+              <span
+                aria-hidden="true"
+                className={`absolute left-1/2 top-4 h-0.5 w-full -translate-y-1/2 transition-colors duration-200 ${
+                  isDone ? 'bg-secondary' : 'bg-slate-200'
+                }`}
+              />
+            )}
+
+            <span
+              aria-current={isActive ? 'step' : undefined}
+              className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-200 ${
+                isDone
+                  ? 'bg-secondary text-white'
+                  : isActive
+                  ? 'border-2 border-secondary bg-white text-secondary'
+                  : 'border border-slate-200 bg-white text-slate-400'
+              }`}
+            >
+              {isDone ? <Check className="h-4 w-4" strokeWidth={3} /> : step.id}
+            </span>
+
+            <span
+              className={`mt-2 text-xs font-bold ${
+                state === 'pending' ? 'text-slate-400' : 'text-primary'
+              }`}
+            >
+              {step.label}
+            </span>
+            <span
+              className={`text-[10px] font-semibold ${
+                state === 'pending' ? 'text-slate-400' : 'text-secondary'
+              }`}
+            >
+              {getStepCaption(index, state)}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function MentorStatusTabs({ value, onChange, locked }) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Status mentor"
+      className={`mt-8 flex justify-center gap-3 transition-opacity duration-200 ${
+        locked ? 'opacity-50' : ''
+      }`}
+    >
+      {Object.entries(DOCUMENT_TYPES).map(([key, doc]) => {
+        const selected = value === key;
+        return (
+          <button
+            key={key}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            disabled={locked}
+            onClick={() => onChange(key)}
+            className={`rounded-full border px-5 py-2.5 text-base transition-all duration-200 disabled:cursor-not-allowed ${
+              selected
+                ? 'border-secondary bg-lightBg text-secondary'
+                : 'border-slate-200 bg-white text-primary/70 hover:border-accent'
+            }`}
+          >
+            {doc.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function UploadZone({ doc, error, onPickFile }) {
+  const inputRef = useRef(null);
+  const [dragging, setDragging] = useState(false);
+
+  const openPicker = () => inputRef.current?.click();
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openPicker();
+    }
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setDragging(false);
+    const droppedFile = event.dataTransfer.files?.[0];
+    if (droppedFile) onPickFile(droppedFile);
+  };
+
+  const handleInputChange = (event) => {
+    const chosenFile = event.target.files?.[0];
+    if (chosenFile) onPickFile(chosenFile);
+    event.target.value = '';
+  };
+
+  return (
+    <div className="mt-6">
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label={doc.uploadTitle}
+        onClick={openPicker}
+        onKeyDown={handleKeyDown}
+        onDragOver={(event) => {
+          event.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={handleDrop}
+        className={`flex cursor-pointer flex-col items-center rounded-3xl border-2 border-dashed px-6 py-11 text-center transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/30 ${
+          dragging
+            ? 'border-secondary bg-accent/10'
+            : 'border-accent bg-lightBg/50 hover:border-secondary'
+        }`}
+      >
+        <span className="flex h-[68px] w-[68px] items-center justify-center rounded-2xl bg-white shadow-sm">
+          <UploadCloud className="h-8 w-8 text-secondary" />
+        </span>
+        <p className="mt-6 text-base font-bold text-primary">{doc.uploadTitle}</p>
+        <p className="mt-1 text-sm text-primary/70">
+          Tarik &amp; lepas file atau <span className="font-bold text-secondary">pilih dari perangkat</span>
+        </p>
+        <span className="mt-4 rounded-full border border-accent bg-white px-3 py-1 text-xs text-primary/80">
+          Format PDF, JPG, PNG (Maks 5 MB)
+        </span>
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+          className="hidden"
+          onChange={handleInputChange}
+        />
+      </div>
+
+      {error && (
+        <p role="alert" className="mt-3 flex items-center gap-1.5 text-xs font-medium text-red-500">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function SelectedFileRow({ file, onRemove }) {
+  return (
+    <div className="mt-4 flex items-center gap-3 rounded-xl border border-accent bg-accent/10 p-3.5">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white">
+        <FileCheck className="h-5 w-5 text-secondary" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-bold text-primary">{file.name}</p>
+        <p className="text-xs font-semibold text-secondary">{formatFileSize(file.size)} · Siap dikirim</p>
+      </div>
+      <button
+        type="button"
+        onClick={onRemove}
+        aria-label="Hapus berkas"
+        className="rounded-full p-2 text-slate-400 transition-colors duration-200 hover:bg-red-50 hover:text-red-500"
+      >
+        <Trash2 className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
+function ResultHero({ title, subtitle, compact }) {
+  return (
+    <div
+      className={`bg-gradient-to-br from-secondary to-primary px-6 text-center text-white ${
+        compact ? 'py-9' : 'py-12'
+      }`}
+    >
+      <span className="mx-auto flex h-[68px] w-[68px] items-center justify-center rounded-full bg-white shadow-lg">
+        <CheckCircle2 className="h-8 w-8 text-secondary" />
+      </span>
+      <h2 className="mt-5 text-xl font-bold">{title}</h2>
+      <p className="mt-1.5 text-sm text-white/80">{subtitle}</p>
+    </div>
+  );
+}
+
+function SubmissionInfo({ submission }) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      <div className="rounded-xl bg-accent/10 p-4">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-secondary">ID Pengajuan</p>
+        <p className="mt-1.5 text-sm font-bold text-primary">{submission.id}</p>
+      </div>
+      <div className="rounded-xl bg-[#F8FAF9] p-4">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Dikirim Pada</p>
+        <p className="mt-1.5 text-sm font-bold text-primary">{submission.sentAt}</p>
+      </div>
+    </div>
+  );
+}
+
+function ReceivedCard({ doc, file, submission }) {
+  return (
+    <section className="mt-6 overflow-hidden rounded-3xl border border-accent/70 bg-white shadow-xl shadow-primary/10">
+      <ResultHero
+        title="Unggahan berhasil diterima"
+        subtitle="Dokumenmu tersimpan dengan aman dan siap diperiksa oleh tim kami."
+        compact
+      />
+
+      <div className="space-y-4 p-7">
+        <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-[#F8FAF9] p-4">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white">
+            <FileCheck className="h-5 w-5 text-secondary" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-bold text-primary">{file.name}</p>
+            <p className="text-xs text-slate-500">
+              {doc.shortName} · {getFileExtension(file.name)} · {formatFileSize(file.size)}
+            </p>
+          </div>
+          <span className="rounded-full bg-accent/30 px-3 py-1 text-xs font-bold text-secondary">
+            Berhasil
+          </span>
+        </div>
+
+        <div className="flex items-start gap-3 rounded-xl border border-accent bg-lightBg p-4">
+          <Hourglass className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+          <div>
+            <p className="text-sm font-bold text-primary">Sedang direview admin</p>
+            <p className="mt-1 text-xs text-primary/70">
+              Estimasi selesai maksimal 2×24 jam kerja. Hasil akan dikirim melalui email.
+            </p>
+          </div>
+        </div>
+
+        <hr className="border-slate-100" />
+
+        <SubmissionInfo submission={submission} />
+      </div>
+    </section>
+  );
+}
+
+function ApprovedCard({ submission }) {
+  return (
+    <section className="mt-6 overflow-hidden rounded-3xl border border-accent/70 bg-white shadow-xl shadow-primary/10">
+      <ResultHero
+        title="Akun Berhasil didaftarkan"
+        subtitle="Masuk kembali menggunakan akun yang telah didaftarkan."
+      />
+      <div className="p-7">
+        <SubmissionInfo submission={submission} />
+      </div>
+    </section>
+  );
+}
+
+function RejectedCard({ attempt, onRetry }) {
+  const reason = REJECTION_REASONS[(attempt - 1) % REJECTION_REASONS.length];
+
+  return (
+    <section className="mt-6 rounded-3xl border border-red-200 bg-red-50 p-6 sm:p-8">
+      <div className="flex gap-5">
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm">
+          <FileText className="h-6 w-6 text-red-500" />
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xl font-bold text-primary">Berkas Belum Disetujui</h2>
+            <span className="rounded-full bg-red-500 px-4 py-1.5 text-xs font-bold text-white">
+              Pengajuan ke-{Math.min(attempt, MAX_ATTEMPTS)} dari {MAX_ATTEMPTS}
+            </span>
+          </div>
+
+          <div className="mt-4 rounded-xl border border-red-200 bg-white p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-red-400">Catatan Admin</p>
+            <p className="mt-1 text-base font-bold text-primary">{reason.judul}</p>
+            <p className="mt-1 text-xs text-slate-500">{reason.catatan}</p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onRetry}
+            className="mt-5 inline-flex items-center gap-2 rounded-full bg-secondary px-8 py-4 text-base font-medium text-white shadow-lg shadow-secondary/30 transition-all duration-200 hover:brightness-110"
+          >
+            Unggah Ulang Berkas
+            <ArrowUpRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function OnboardingPage({
+  applicant,
+  mentorStatus,
+  onChangeMentorStatus,
+  approvalStatus,
+  file,
+  fileError,
+  onPickFile,
+  onRemoveFile,
+  onSubmitFile,
+  submission,
+  attemptCount,
+  onRetry,
+  onGoLogin,
+}) {
+  const doc = DOCUMENT_TYPES[mentorStatus];
+  const sampleFile = {
+    name: `${doc.filePrefix}_${getFirstName(applicant.nama)}_${doc.fileSuffix}.pdf`,
+    size: SAMPLE_FILE_SIZE,
+    type: 'application/pdf',
+  };
+  const shownFile = file ?? sampleFile;
+  const shownSubmission = submission ?? SAMPLE_SUBMISSION;
+
+  return (
+    <div className="flex flex-1 flex-col bg-white">
+      <header className="flex items-center justify-between border-b border-slate-100 px-6 py-5 md:px-10">
+        <Logo variant="color" />
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <p className="text-sm font-bold text-primary">{applicant.nama}</p>
+            <p className="text-xs text-slate-500">Calon Mentor</p>
+          </div>
+          <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-accent bg-accent/20 text-sm font-bold text-secondary">
+            {getInitials(applicant.nama)}
+          </span>
+        </div>
+      </header>
+
+      <main className="mx-auto w-full max-w-[866px] flex-1 px-4 pb-16 pt-8">
+        <Stepper approvalStatus={approvalStatus} />
+
+        <div className="mx-auto max-w-[713px]">
+          <div className="mt-12 text-center">
+            <p className={EYEBROW}>Verifikasi Mentor</p>
+            <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-primary sm:text-4xl">
+              Unggah Dokumen Pendukung
+            </h1>
+            <p className="mt-3 text-sm text-primary/70">
+              Dokumen ini membantu kami menjaga kualitas dan keamanan komunitas Mentlify.
+            </p>
+          </div>
+
+          <MentorStatusTabs
+            value={mentorStatus}
+            onChange={onChangeMentorStatus}
+            locked={approvalStatus === 'menunggu'}
+          />
+
+          {approvalStatus === 'belum_unggah' && (
+            <>
+              <UploadZone doc={doc} error={fileError} onPickFile={onPickFile} />
+              {file && <SelectedFileRow file={file} onRemove={onRemoveFile} />}
+              <button
+                type="button"
+                onClick={onSubmitFile}
+                disabled={!file}
+                className={`${PRIMARY_BUTTON} mt-6`}
+              >
+                Kirim Berkas untuk Diverifikasi
+                <ArrowUpRight className="h-4 w-4" />
+              </button>
+            </>
+          )}
+
+          {approvalStatus === 'menunggu' && (
+            <ReceivedCard doc={doc} file={shownFile} submission={shownSubmission} />
+          )}
+
+          {approvalStatus === 'disetujui' && (
+            <>
+              <ApprovedCard submission={shownSubmission} />
+              <button type="button" onClick={onGoLogin} className={`${PRIMARY_BUTTON} mt-6`}>
+                Masuk ke Akun
+                <ArrowUpRight className="h-4 w-4" />
+              </button>
+            </>
+          )}
+
+          {approvalStatus === 'ditolak' && (
+            <RejectedCard attempt={attemptCount} onRetry={onRetry} />
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Komponen Utama (AuthForm)                                          */
 /* ------------------------------------------------------------------ */
 
 export default function AuthForm({
   onSuccessLogin,
   onForgotPassword,
+  initialMode = 'login',
   showSimulation = true,
 }) {
-  // 'login' | 'register' | 'verification'
-  const [authMode, setAuthMode] = useState('login');
+  // 'login' | 'register' | 'verification' | 'onboarding'
+  const [authMode, setAuthMode] = useState(initialMode);
 
-  // --- Login ---
+  // --- Login State ---
   const [loginForm, setLoginForm] = useState({ email: '', password: '', remember: false });
   const [showPassword, setShowPassword] = useState(false);
   const [simulateLock, setSimulateLock] = useState(false);
   const [lockSeconds, setLockSeconds] = useState(LOCK_DURATION);
 
-  // --- Register ---
+  // --- Register State ---
   const [role, setRole] = useState('mentee'); // 'mentee' | 'mentor'
   const [mentorStatus, setMentorStatus] = useState('mahasiswa'); // 'mahasiswa' | 'alumni'
   const [registerForm, setRegisterForm] = useState(EMPTY_REGISTER_FORM);
   const [registerErrors, setRegisterErrors] = useState({});
   const [agree, setAgree] = useState(false);
 
-  // --- Verifikasi ---
+  // --- Verifikasi State ---
   const [verifyEmail, setVerifyEmail] = useState('mhs@kampus.ac.id');
   const [verifyStatus, setVerifyStatus] = useState('default'); // 'default' | 'sent' | 'expired'
   const [resendSeconds, setResendSeconds] = useState(RESEND_DURATION);
+
+  // --- Onboarding State ---
+  const [applicant, setApplicant] = useState(DEFAULT_APPLICANT);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [fileError, setFileError] = useState('');
+  const [submission, setSubmission] = useState(null);
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [adminApprovalStatus, setAdminApprovalStatus] = useState('belum_unggah');
 
   /* Hitung mundur akun terkunci */
   useEffect(() => {
@@ -909,7 +1457,7 @@ export default function AuthForm({
     return () => clearTimeout(timer);
   }, [authMode, resendSeconds]);
 
-  /* ---------------- Aksi ---------------- */
+  /* ---------------- Aksi Auth ---------------- */
 
   const toggleLock = (checked) => {
     setSimulateLock(checked);
@@ -922,7 +1470,7 @@ export default function AuthForm({
     if (typeof onSuccessLogin === 'function') {
       onSuccessLogin();
     } else {
-      window.location.assign('/dashbor');
+      window.location.assign('/dasbor');
     }
   };
 
@@ -1005,6 +1553,11 @@ export default function AuthForm({
     if (Object.keys(errors).length > 0) return;
 
     setVerifyEmail(email);
+    setApplicant({
+      nama: registerForm.nama,
+      email,
+      mentorStatus,
+    });
     showVerification('default');
   };
 
@@ -1017,10 +1570,70 @@ export default function AuthForm({
     window.open('https://mail.google.com', '_blank', 'noopener,noreferrer');
   };
 
-  /* ---------------- Tombol simulasi ---------------- */
+  // Navigasi dari Verifikasi -> Onboarding untuk Mentor
+  const handleProceedToOnboarding = () => {
+    setAuthMode('onboarding');
+    setAdminApprovalStatus('belum_unggah');
+    setUploadedFile(null);
+  };
+
+  /* ---------------- Aksi Onboarding ---------------- */
+
+  const handlePickFile = (file) => {
+    const typeAllowed =
+      ['application/pdf', 'image/jpeg', 'image/png'].includes(file.type) ||
+      /\.(pdf|jpe?g|png)$/i.test(file.name);
+
+    if (!typeAllowed) {
+      setFileError('Format file harus PDF, JPG, atau PNG.');
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setFileError('Ukuran file melebihi 5 MB.');
+      return;
+    }
+
+    setFileError('');
+    setUploadedFile({ name: file.name, size: file.size, type: file.type, raw: file });
+  };
+
+  const handleRemoveFile = () => {
+    setUploadedFile(null);
+    setFileError('');
+  };
+
+  const handleChangeMentorStatus = (nextStatus) => {
+    if (nextStatus === mentorStatus) return;
+    setMentorStatus(nextStatus);
+    setUploadedFile(null);
+    setFileError('');
+  };
+
+  const handleSubmitFile = () => {
+    if (!uploadedFile) return;
+    setSubmission({ id: createSubmissionId(), sentAt: formatSentAt(new Date()) });
+    setAttemptCount((prev) => prev + 1);
+    setAdminApprovalStatus('menunggu');
+  };
+
+  const handleRetry = () => {
+    setUploadedFile(null);
+    setFileError('');
+    setAdminApprovalStatus('belum_unggah');
+  };
+
+  /* ---------------- Tombol Simulasi ---------------- */
 
   const isRegister = authMode === 'register';
   const isVerification = authMode === 'verification';
+  const isOnboarding = authMode === 'onboarding';
+
+  const doc = DOCUMENT_TYPES[mentorStatus];
+  const sampleFile = {
+    name: `${doc.filePrefix}_${getFirstName(applicant.nama)}_${doc.fileSuffix}.pdf`,
+    size: SAMPLE_FILE_SIZE,
+    type: 'application/pdf',
+  };
 
   const simulationItems = [
     {
@@ -1061,21 +1674,65 @@ export default function AuthForm({
     },
     {
       key: 'verif',
-      label: 'Verifikasi',
+      label: 'Verifikasi Email',
       active: isVerification && verifyStatus === 'default',
       onClick: () => showVerification('default'),
-    },
-    {
-      key: 'verif-sent',
-      label: 'Link Baru Terkirim',
-      active: isVerification && verifyStatus === 'sent',
-      onClick: () => showVerification('sent'),
     },
     {
       key: 'verif-expired',
       label: 'Token Kedaluwarsa',
       active: isVerification && verifyStatus === 'expired',
       onClick: () => showVerification('expired'),
+    },
+    {
+      key: 'ob-awal',
+      label: 'Onboarding Awal',
+      active: isOnboarding && adminApprovalStatus === 'belum_unggah' && !uploadedFile,
+      onClick: () => {
+        setAuthMode('onboarding');
+        setAdminApprovalStatus('belum_unggah');
+        setUploadedFile(null);
+      },
+    },
+    {
+      key: 'ob-berkas',
+      label: 'Berkas Dipilih',
+      active: isOnboarding && adminApprovalStatus === 'belum_unggah' && Boolean(uploadedFile),
+      onClick: () => {
+        setAuthMode('onboarding');
+        setAdminApprovalStatus('belum_unggah');
+        setUploadedFile(sampleFile);
+      },
+    },
+    {
+      key: 'ob-menunggu',
+      label: 'Menunggu Review',
+      active: isOnboarding && adminApprovalStatus === 'menunggu',
+      onClick: () => {
+        setAuthMode('onboarding');
+        setSubmission(SAMPLE_SUBMISSION);
+        setAdminApprovalStatus('menunggu');
+      },
+    },
+    {
+      key: 'ob-disetujui',
+      label: 'Disetujui',
+      active: isOnboarding && adminApprovalStatus === 'disetujui',
+      onClick: () => {
+        setAuthMode('onboarding');
+        setSubmission(SAMPLE_SUBMISSION);
+        setAdminApprovalStatus('disetujui');
+      },
+    },
+    {
+      key: 'ob-ditolak',
+      label: 'Ditolak',
+      active: isOnboarding && adminApprovalStatus === 'ditolak',
+      onClick: () => {
+        setAuthMode('onboarding');
+        setAttemptCount(2);
+        setAdminApprovalStatus('ditolak');
+      },
     },
   ];
 
@@ -1099,7 +1756,6 @@ export default function AuthForm({
           setShowPassword={setShowPassword}
           locked={simulateLock}
           lockSeconds={lockSeconds}
-          onToggleLock={toggleLock}
           onSubmit={handleLoginSubmit}
           onGoRegister={() => showRegister('mentee', 'mahasiswa', false)}
           onForgotPassword={handleForgotPassword}
@@ -1127,9 +1783,29 @@ export default function AuthForm({
           status={verifyStatus}
           email={verifyEmail}
           resendSeconds={resendSeconds}
+          role={role}
           onResend={handleResend}
           onExpire={() => setVerifyStatus('expired')}
           onOpenMail={handleOpenMail}
+          onProceedOnboarding={handleProceedToOnboarding}
+        />
+      )}
+
+      {authMode === 'onboarding' && (
+        <OnboardingPage
+          applicant={applicant}
+          mentorStatus={mentorStatus}
+          onChangeMentorStatus={handleChangeMentorStatus}
+          approvalStatus={adminApprovalStatus}
+          file={uploadedFile}
+          fileError={fileError}
+          onPickFile={handlePickFile}
+          onRemoveFile={handleRemoveFile}
+          onSubmitFile={handleSubmitFile}
+          submission={submission}
+          attemptCount={attemptCount}
+          onRetry={handleRetry}
+          onGoLogin={() => showLogin(false)}
         />
       )}
     </div>

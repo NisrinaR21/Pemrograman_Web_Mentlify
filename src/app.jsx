@@ -25,7 +25,10 @@ function App() {
     }
   }, [location.pathname]);
 
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/auth';
+  const isAuthPage =
+    location.pathname === '/login' ||
+    location.pathname === '/auth' ||
+    location.pathname === '/onboarding';
 
   return (
     <div className="min-h-screen bg-lightBg font-sans">
@@ -39,6 +42,10 @@ function App() {
         <Route path="/admin/verifikasi-mentor" element={<DashboardPage userRole={userRole} />} />
         <Route path="/login" element={<AuthForm onSuccessLogin={() => navigate('/')} />} />
         <Route path="/auth" element={<AuthForm onSuccessLogin={() => navigate('/')} />} />
+        <Route
+          path="/onboarding"
+          element={<AuthForm onSuccessLogin={() => navigate('/')} initialMode="onboarding" />}
+        />
       </Routes>
     </div>
   );
