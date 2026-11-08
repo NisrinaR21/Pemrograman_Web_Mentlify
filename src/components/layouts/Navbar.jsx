@@ -6,24 +6,15 @@ import {
   Bell,
   CalendarClock,
   Coins,
-  GraduationCap,
   Menu,
-  Scale,
   Star,
-  UserCheck,
   Wallet,
   X,
 } from 'lucide-react';
+import logoWhite from '../../assets/logo-white.png';
 
-/* ------------------------------------------------------------------ */
-/* Konstanta & data dummy                                              */
-/* ------------------------------------------------------------------ */
-
-// Sama dengan `lightBg` di tailwind.config.js. Dipakai untuk lengkungan tab aktif.
+// Warna canvas yang sama dengan `lightBg` di tailwind.config.js
 const LIGHT_BG = '#F2F2ED';
-const FLARE = 28; // radius lengkungan (px) di kiri & kanan bawah tab aktif
-
-const APP_NAME = 'Mentlify'; // ganti dengan logo putih milikmu bila sudah ada
 
 const ROLES = [
   { key: 'mentee', label: 'Mentee' },
@@ -125,11 +116,6 @@ const formatRupiah = (value) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-const flareStyle = (side) => ({
-  background: `radial-gradient(circle at ${side === 'left' ? '0 0' : '100% 0'
-    }, transparent ${FLARE - 1}px, ${LIGHT_BG} ${FLARE}px)`,
-});
-
 /* ------------------------------------------------------------------ */
 /* Sub-komponen                                                        */
 /* ------------------------------------------------------------------ */
@@ -141,8 +127,8 @@ function SimButton({ active = false, onClick, children }) {
       onClick={onClick}
       aria-pressed={active}
       className={`rounded-md border px-2.5 py-1 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${active
-          ? 'border-secondary bg-secondary text-white'
-          : 'border-amber-300 bg-white text-primary hover:bg-amber-50'
+        ? 'border-secondary bg-secondary text-white'
+        : 'border-amber-300 bg-white text-primary hover:bg-amber-50'
         }`}
     >
       {children}
@@ -219,31 +205,51 @@ function Brand({ isAdmin, home }) {
   return (
     <Link
       to={home}
-      className="flex items-center gap-2 rounded-lg text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      className="flex items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
-      <GraduationCap className="h-8 w-8" aria-hidden="true" />
-      <span className="text-2xl font-extrabold tracking-tight">{APP_NAME}</span>
+      <img src={logoWhite} alt="Mentlify" className="h-6 w-auto object-contain" />
     </Link>
   );
 }
 
 // Tab desktop. Tab aktif berwarna lightBg dengan lengkungan di kiri-kanan bawah
 // sehingga menyatu dengan kanvas halaman di bawah navbar.
+// Admin mode: tanpa lengkungan, cukup border-bottom aktif.
 function TabLink({ to, label, tone }) {
   const isLightBar = tone === 'light';
 
+  // Admin: tab sederhana tanpa flare
+  if (isLightBar) {
+    return (
+      <li className="flex h-full items-center">
+        <NavLink
+          to={to}
+          className={({ isActive }) =>
+            [
+              'relative flex h-full items-center whitespace-nowrap px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary',
+              isActive
+                ? 'font-bold text-secondary border-b-[3px] border-secondary'
+                : 'text-primary/60 hover:text-primary',
+            ].join(' ')
+          }
+        >
+          {label}
+        </NavLink>
+      </li>
+    );
+  }
+
+  // Mentee / Mentor: tab folder dengan lengkungan mulus (flare)
   return (
-    <li className={`flex ${isLightBar ? '-mb-px' : ''}`}>
+    <li className="flex items-end">
       <NavLink
         to={to}
         className={({ isActive }) =>
           [
-            'relative flex h-[3.75rem] items-center whitespace-nowrap px-7 text-[0.95rem] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+            'relative flex h-11 items-center whitespace-nowrap px-6 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
             isActive
-              ? 'rounded-t-[1.5rem] bg-lightBg font-bold text-secondary'
-              : isLightBar
-                ? 'rounded-t-[1.5rem] font-semibold text-primary/70 hover:text-primary'
-                : 'rounded-t-[1.5rem] font-semibold text-accent hover:text-white',
+              ? 'rounded-t-2xl bg-lightBg font-bold text-secondary z-10'
+              : 'font-medium text-white/80 hover:text-white',
           ].join(' ')
         }
       >
@@ -251,16 +257,24 @@ function TabLink({ to, label, tone }) {
           <>
             {isActive && (
               <>
-                <span
+                {/* Lengkungan kiri (flare) halus via SVG — transparan di atas, warna lightBg di sudut bawah */}
+                <svg
+                  className="absolute bottom-0 right-full h-4 w-4 pointer-events-none z-10"
+                  viewBox="0 0 16 16"
+                  fill="none"
                   aria-hidden="true"
-                  className="absolute bottom-0 right-full h-7 w-7"
-                  style={flareStyle('left')}
-                />
-                <span
+                >
+                  <path d="M16 0 Q16 16 0 16 L16 16 Z" fill={LIGHT_BG} />
+                </svg>
+                {/* Lengkungan kanan (flare) halus via SVG */}
+                <svg
+                  className="absolute bottom-0 left-full h-4 w-4 pointer-events-none z-10"
+                  viewBox="0 0 16 16"
+                  fill="none"
                   aria-hidden="true"
-                  className="absolute bottom-0 left-full h-7 w-7"
-                  style={flareStyle('right')}
-                />
+                >
+                  <path d="M0 0 Q0 16 16 16 L0 16 Z" fill={LIGHT_BG} />
+                </svg>
               </>
             )}
             {label}
@@ -275,10 +289,10 @@ function TopUpButton() {
   return (
     <Link
       to="/mentee/top-up"
-      className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-accentYellow px-6 py-3 text-[0.95rem] font-bold text-[#5A3A00] shadow-[0_10px_24px_-6px_rgba(249,199,79,0.75)] transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-accentYellow px-4 py-1.5 text-xs font-bold text-[#5A3A00] shadow-sm transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
     >
       Top Up +
-      <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+      <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
     </Link>
   );
 }
@@ -293,16 +307,16 @@ function PayoutInfo({ filled }) {
     <Link
       to="/mentor/payout"
       title={hint}
-      className="inline-flex items-center gap-3 whitespace-nowrap rounded-full bg-accentYellow py-2 pl-2.5 pr-5 text-[#5A3A00] shadow-[0_10px_24px_-6px_rgba(249,199,79,0.75)] transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+      className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-accentYellow py-1 pl-1.5 pr-3 text-[#5A3A00] shadow-sm transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
     >
-      <span className="grid h-9 w-9 place-items-center rounded-full bg-white/60">
-        <Wallet className="h-5 w-5" aria-hidden="true" />
+      <span className="grid h-6 w-6 place-items-center rounded-full bg-white/70">
+        <Wallet className="h-3 w-3 text-[#5A3A00]" aria-hidden="true" />
       </span>
       <span className="leading-tight">
-        <span className="block text-[11px] font-semibold opacity-80">Saldo payout</span>
-        <span className="block text-sm font-bold">{formatRupiah(amount)}</span>
+        <span className="block text-[9px] font-semibold text-[#5A3A00]/80">Saldo payout</span>
+        <span className="block text-xs font-bold text-[#5A3A00]">{formatRupiah(amount)}</span>
       </span>
-      <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+      <ArrowUpRight className="h-3.5 w-3.5 text-[#5A3A00]/70" aria-hidden="true" />
     </Link>
   );
 }
@@ -339,13 +353,13 @@ function NotificationBell({ role, hasUnread, setHasUnread, open, setOpen }) {
         aria-label={hasUnread ? 'Notifikasi, ada yang belum dibaca' : 'Notifikasi'}
         aria-haspopup="true"
         aria-expanded={open}
-        className="relative grid h-11 w-11 place-items-center rounded-full border border-accent/50 text-accent transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="relative grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
-        <Bell className="h-5 w-5" aria-hidden="true" />
+        <Bell className="h-4 w-4" aria-hidden="true" />
         {hasUnread && (
           <span
             aria-hidden="true"
-            className="absolute right-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-primary"
+            className="absolute right-0.5 top-0.5 h-2 w-2 rounded-full bg-red-500 ring-1 ring-primary"
           />
         )}
       </button>
@@ -402,23 +416,23 @@ function NotificationBell({ role, hasUnread, setHasUnread, open, setOpen }) {
 
 function AdminProfile({ onLogout }) {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-3">
       <div className="text-right leading-tight">
-        <p className="text-sm font-bold text-primary">{ADMIN_USER.name}</p>
-        <p className="text-xs text-slate-500">{ADMIN_USER.role}</p>
+        <p className="text-xs font-bold text-primary">{ADMIN_USER.name}</p>
+        <p className="text-[11px] text-slate-500">{ADMIN_USER.role}</p>
       </div>
       <span
         aria-hidden="true"
-        className="grid h-10 w-10 place-items-center rounded-full bg-accent/30 text-sm font-bold text-primary ring-2 ring-accent"
+        className="grid h-8 w-8 place-items-center rounded-full bg-accent/30 text-xs font-bold text-primary ring-2 ring-accent"
       >
         {ADMIN_USER.initials}
       </span>
       <button
         type="button"
         onClick={onLogout}
-        className="inline-flex items-center gap-2 rounded-md border border-red-400 bg-white px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+        className="inline-flex items-center gap-1.5 rounded-md border border-red-300 bg-white px-3 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
       >
-        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
         Keluar
       </button>
     </div>
@@ -498,15 +512,17 @@ export default function Navbar({
       <nav
         aria-label="Navigasi utama"
         className={
-          isAdmin ? 'border-b border-slate-200 bg-white' : 'bg-primary'
+          isAdmin
+            ? 'border-b border-slate-200 bg-white'
+            : 'bg-primary'
         }
       >
-        <div className="mx-auto flex h-16 max-w-screen-2xl items-stretch justify-between px-4 md:h-20 md:px-8">
+        <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-4 md:px-8">
           <Brand isAdmin={isAdmin} home={home} />
 
           {/* Desktop */}
           <ul
-            className={`hidden items-end gap-3 md:flex ${isAdmin ? 'ml-10 mr-auto' : 'ml-auto mr-10'
+            className={`hidden h-full md:flex ${isAdmin ? 'ml-10 mr-auto items-center gap-2' : 'ml-auto mr-8 items-end gap-1'
               }`}
           >
             {items.map((item) => (
@@ -519,7 +535,7 @@ export default function Navbar({
             ))}
           </ul>
 
-          <div className="hidden items-center gap-4 md:flex">
+          <div className="hidden items-center gap-3.5 md:flex">
             {role === 'mentee' && <TopUpButton />}
             {role === 'mentor' && <PayoutInfo filled={payoutFilled} />}
             {role !== 'admin' && <NotificationBell {...bellProps} />}
@@ -534,9 +550,9 @@ export default function Navbar({
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label={mobileOpen ? 'Tutup menu' : 'Buka menu'}
               aria-expanded={mobileOpen}
-              className={`grid h-11 w-11 place-items-center rounded-full border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${isAdmin
-                  ? 'border-slate-300 text-primary'
-                  : 'border-accent/50 text-accent'
+              className={`grid h-10 w-10 place-items-center rounded-full border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${isAdmin
+                ? 'border-slate-300 text-primary'
+                : 'border-accent/50 text-accent'
                 }`}
             >
               {mobileOpen ? (

@@ -1,20 +1,10 @@
-# 🤖 Template Prompt Wajib untuk 15 Akun Claude
-
-Setiap kali kamu atau temanmu membuka *New Chat* atau berganti akun Claude, **WAJIB** *copy-paste* template di bawah ini paling atas sebelum mengirim gambar potongan Figma!
-
----
-
-## 🧩 PROMPT 1: Untuk Membuat Potongan Komponen / Bagian dari Halaman
-*(Gunakan ini saat mengirim potongan gambar seperti Navbar saja, Kotak Jadwal saja, Kotak Misi saja, atau Pop-up saja)*
-
-```text
-[ATURAN WAJIB PROYEK MENTLIFY - PATUHI 100%]
+[ATURAN WAJIB PROYEK MENTLIFY]
 Kamu adalah Senior Frontend Developer ahli React JS (Vite) dan Tailwind CSS.
-Tugasmu adalah mengubah gambar potongan desain Figma yang saya kirim menjadi 1 file komponen React (.jsx) yang sangat presisi sesuai aturan proyek.
+Ubah potongan gambar Figma yang saya kirim menjadi 1 file komponen React (.jsx) utuh yang siap pakai.
 
-ATURAN TEKNIS WAJIB:
-1. KAMUS WARNA: Gunakan HANYA class warna custom dari tailwind.config.js proyek Mentlify saya berikut ini (atau warna netral bawaan Tailwind seperti white/slate/gray):
-   - Frame Navigasi & Judul Gelap: bg-primary / text-primary (#464B71)
+ATURAN TEKNIS:
+1. Gunakan class warna custom dari tailwind.config.js saya:
+    - Frame Navigasi & Judul Gelap: bg-primary / text-primary (#464B71)
    - Tombol Utama (CTA) & Sesi Aktif: bg-secondary / text-secondary (#118AB2)
      * Efek Hover: hover:brightness-110 atau hover:opacity-90
    - Border Kartu & Aksen Toska Lembut: border-accent / bg-accent / text-accent (#7CD5C7)
@@ -23,8 +13,11 @@ ATURAN TEKNIS WAJIB:
    - Status Khusus:
      * Menunggu Respons (Warning): bg-[#F9A03F] text-white
      * Ditolak / Batal (Danger): bg-red-500 text-white / border-red-400 text-red-500
-
-2. IKON: Gunakan paket `lucide-react` untuk semua ikon (contoh: import { ArrowUpRight, Flame, Calendar, Bell, Clock, BookOpen, CheckCircle2 } from 'lucide-react'). Dilarang membuat kode <svg> manual yang panjang di file komponen.
+2. Gunakan library `lucide-react` untuk semua ikon. Jangan tulis SVG manual yang panjang.
+3. Gabungkan semua gambar kondisi/state/pop-up yang saya lampirkan ke dalam 1 file .jsx ini menggunakan `useState` dan data dummy array yang realistis.
+4. WAJIB buat bar kecil bertuliskan "🛠️ Simulasi Presentasi:" di pojok atas komponen berisi tombol-tombol kecil untuk mengganti-ganti state (misal: ganti tampilan kosong/berisi, atau buka pop-up) agar mudah saya demokan ke dosen.
+5. Tulis kode lengkap dari `import` sampai `export default` tanpa ada bagian yang disingkat `// ...`.
+---
 
 3. STANDAR BENTUK KOMPONEN (CRAP DESIGN UI):
    - Tombol & Pill: Semua tombol aksi (CTA), filter tab status, dan badge status wajib berbentuk kapsul penuh (`rounded-full`).
