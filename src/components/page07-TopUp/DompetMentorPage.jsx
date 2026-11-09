@@ -18,12 +18,11 @@ import {
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
-/*  Font (sesuai Figma: Montserrat untuk judul, Merriweather untuk isi) */
+/*  Font styling (selaras dengan font-sans sistem Mentlify)            */
 /* ------------------------------------------------------------------ */
-const FONT_IMPORT =
-    "@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Montserrat:wght@500;600;700;800&display=swap');";
-const HEAD_FONT = { fontFamily: "'Montserrat', 'Segoe UI', sans-serif" };
-const BODY_FONT = { fontFamily: "'Merriweather', Georgia, serif" };
+const FONT_IMPORT = "";
+const HEAD_FONT = {};
+const BODY_FONT = {};
 
 /* ------------------------------------------------------------------ */
 /*  Konstanta & data dummy                                             */
@@ -279,71 +278,41 @@ function GridSaldoMentor({ saldo, onTarikDana }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Sub-komponen: Header Payout (judul + RBAC + saldo)                 */
+/*  Sub-komponen: Header Payout (judul + saldo)                        */
 /* ------------------------------------------------------------------ */
-function HeaderPayout({ saldo, rbac, onRbac, onKembali }) {
+function HeaderPayout({ saldo, onKembali }) {
     return (
         <div>
-            {/* Selector RBAC */}
-            <div className="flex justify-end">
-                <div
-                    className="rounded-full border border-accent bg-white p-1 flex flex-wrap items-center gap-1"
-                    style={HEAD_FONT}
-                >
-                    <span className="px-3 text-xs font-bold text-slate-500 tracking-wide uppercase">Akses RBAC</span>
-                    {RBAC_ITEMS.map((item) => (
-                        <button
-                            key={item}
-                            type="button"
-                            onClick={() => onRbac(item)}
-                            className={
-                                rbac === item
-                                    ? "rounded-full bg-secondary text-white font-bold px-3.5 py-1.5 text-xs shadow-sm transition-all duration-200"
-                                    : "rounded-full text-primary font-semibold px-3.5 py-1.5 text-xs hover:bg-lightBg transition-all duration-200"
-                            }
-                        >
-                            {item}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {rbac !== "Mentor" && (
-                <p className="mt-2 text-right text-xs text-slate-500 flex items-center justify-end gap-1.5">
-                    <AlertCircle size={14} className="text-secondary" />
-                    Halaman ini hanya merancang tampilan Mentor. Tampilan {rbac} dikerjakan terpisah.
-                </p>
-            )}
-
-            {/* Judul */}
-            <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
-                <div>
-                    <p className="text-[11px] font-bold text-secondary tracking-wider uppercase" style={HEAD_FONT}>
-                        UC-12 • Mentor Payout
-                    </p>
-                    <h1 className="text-3xl md:text-4xl font-semibold text-primary mt-3" style={HEAD_FONT}>
-                        Pencairan Dana Mentor
-                    </h1>
-                    <p className="text-sm text-slate-500 mt-3">
-                        Konversi saldo pendapatan menjadi transfer bank atau e-wallet terverifikasi.
-                    </p>
-                </div>
+            {/* Tombol kembali di kiri (selaras semua page) */}
+            <div className="mb-4">
                 <button
                     type="button"
                     onClick={onKembali}
-                    className="rounded-full border border-secondary text-secondary bg-white hover:bg-secondary/10 font-medium px-4 py-2 text-sm flex items-center justify-center gap-1.5 transition-all duration-200"
-                    style={HEAD_FONT}
+                    className="inline-flex items-center gap-2 rounded-full border border-secondary/40 bg-white px-4 py-2 text-xs font-bold text-secondary shadow-sm transition-all hover:bg-secondary/10"
                 >
+                    <ArrowLeft size={14} />
                     Kembali ke Dompet
-                    <ArrowLeft size={16} />
                 </button>
+            </div>
+
+            {/* Judul Halaman */}
+            <div>
+                <p className="text-xs font-bold text-secondary tracking-widest uppercase">
+                    Pencairan Dana
+                </p>
+                <h1 className="text-3xl md:text-4xl font-normal text-primary mt-2">
+                    Pencairan Dana Mentor
+                </h1>
+                <p className="text-sm text-slate-500 mt-2">
+                    Konversi saldo pendapatan menjadi transfer bank atau e-wallet terverifikasi.
+                </p>
             </div>
 
             {/* Kartu saldo */}
             <section className="mt-6 bg-primary text-white rounded-3xl p-7 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-0">
                 <div className="sm:pr-8 sm:border-r sm:border-white/20">
-                    <p className="text-[11px] font-bold text-accent tracking-wider uppercase" style={HEAD_FONT}>
-                        saldo_redeemable
+                    <p className="text-[11px] font-bold text-accent tracking-wider uppercase">
+                        Saldo Siap Ditarik
                     </p>
                     <p className="mt-3">
                         <span className="text-4xl font-bold">{saldo.redeemable}</span>{" "}
@@ -352,14 +321,14 @@ function HeaderPayout({ saldo, rbac, onRbac, onKembali }) {
                     <p className="text-sm mt-2 text-white/90">Setara {formatRupiah(saldo.redeemable * KURS_PER_KOIN)}</p>
                 </div>
                 <div className="sm:pl-8">
-                    <p className="text-[11px] font-bold text-accent tracking-wider uppercase" style={HEAD_FONT}>
-                        saldo_payout_tertahan
+                    <p className="text-[11px] font-bold text-accent tracking-wider uppercase">
+                        Saldo Dalam Proses
                     </p>
                     <p className="mt-3">
                         <span className="text-4xl font-bold">{saldo.payoutTertahan}</span>{" "}
                         <span className="text-lg text-accent">Koin</span>
                     </p>
-                    <p className="text-sm mt-2 text-white/90">Sedang diproses</p>
+                    <p className="text-sm mt-2 text-white/90">Sedang diproses oleh admin keuangan</p>
                 </div>
             </section>
         </div>
@@ -369,7 +338,7 @@ function HeaderPayout({ saldo, rbac, onRbac, onKembali }) {
 /* ------------------------------------------------------------------ */
 /*  Sub-komponen: Kartu Rekening Tujuan Aktif                          */
 /* ------------------------------------------------------------------ */
-function KartuRekening({ rekening, onTambah }) {
+function KartuRekening({ rekening, onTambah, onToggleRekening }) {
     return (
         <section className="bg-white rounded-2xl border border-accent/70 p-5 shadow-sm">
             <div className="flex items-start justify-between gap-3">
@@ -378,10 +347,10 @@ function KartuRekening({ rekening, onTambah }) {
                         <Wallet size={18} />
                     </span>
                     <div>
-                        <p className="text-[11px] font-bold text-secondary tracking-wider uppercase" style={HEAD_FONT}>
+                        <p className="text-[11px] font-bold text-secondary tracking-wider uppercase">
                             Rekening Tujuan Aktif
                         </p>
-                        <h2 className="text-xl font-bold text-primary mt-1" style={HEAD_FONT}>
+                        <h2 className="text-xl font-bold text-primary mt-1">
                             {rekening
                                 ? `${rekening.tipe === "bank" ? "Bank Transfer" : "E-Wallet"} • ${rekening.penyedia}`
                                 : "Belum ada rekening"}
@@ -391,18 +360,12 @@ function KartuRekening({ rekening, onTambah }) {
 
                 {rekening &&
                     (rekening.terverifikasi ? (
-                        <span
-                            className="rounded-full bg-lightBg text-primary text-xs font-bold px-3 py-1.5 flex items-center gap-1.5 shrink-0"
-                            style={HEAD_FONT}
-                        >
+                        <span className="rounded-full bg-lightBg text-primary text-xs font-bold px-3 py-1.5 flex items-center gap-1.5 shrink-0">
                             <Check size={14} />
                             Terverifikasi Admin Keuangan
                         </span>
                     ) : (
-                        <span
-                            className="rounded-full bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1.5 flex items-center gap-1.5 shrink-0"
-                            style={HEAD_FONT}
-                        >
+                        <span className="rounded-full bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1.5 flex items-center gap-1.5 shrink-0">
                             <Clock size={14} />
                             Menunggu verifikasi
                         </span>
@@ -421,35 +384,55 @@ function KartuRekening({ rekening, onTambah }) {
                             <p className="text-sm font-bold text-primary mt-2">{rekening.nama}</p>
                         </div>
                     </div>
-                    <button
-                        type="button"
-                        onClick={onTambah}
-                        className="mt-4 rounded-full border border-secondary text-secondary bg-white hover:bg-secondary/10 font-bold px-4 py-2 text-sm transition-all duration-200"
-                        style={HEAD_FONT}
-                    >
-                        Tambah / Ganti Rekening
-                    </button>
+                    <div className="mt-4 flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-slate-100">
+                        <button
+                            type="button"
+                            onClick={onTambah}
+                            className="rounded-full border border-secondary text-secondary bg-white hover:bg-secondary/10 font-bold px-4 py-2 text-xs transition-all duration-200"
+                        >
+                            Tambah / Ganti Rekening
+                        </button>
+                        {onToggleRekening && (
+                            <button
+                                type="button"
+                                onClick={onToggleRekening}
+                                className="rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 text-[11px] font-semibold transition-all"
+                            >
+                                Simulasi: {rekening ? "Kosongkan Rekening" : "Isi Rekening"}
+                            </button>
+                        )}
+                    </div>
                 </>
             ) : (
                 <div className="mt-6 rounded-xl border border-dashed border-accent bg-[#F8FAF9] p-6 flex flex-col items-center text-center gap-2">
                     <span className="w-10 h-10 rounded-xl bg-lightBg text-secondary flex items-center justify-center">
                         <ShieldAlert size={18} />
                     </span>
-                    <p className="text-sm font-bold text-primary" style={HEAD_FONT}>
+                    <p className="text-sm font-bold text-primary">
                         Rekening tujuan belum ditambahkan
                     </p>
                     <p className="text-xs text-slate-500 max-w-xs">
                         Tambahkan rekening bank atau e-wallet atas namamu sebelum mengajukan penarikan dana.
                     </p>
-                    <button
-                        type="button"
-                        onClick={onTambah}
-                        className="mt-2 rounded-full bg-secondary hover:brightness-110 text-white font-medium px-4 py-2 text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-sm"
-                        style={HEAD_FONT}
-                    >
-                        Tambah Rekening
-                        <ArrowUpRight size={16} />
-                    </button>
+                    <div className="mt-2 flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={onTambah}
+                            className="rounded-full bg-secondary hover:brightness-110 text-white font-medium px-4 py-2 text-xs flex items-center justify-center gap-2 transition-all duration-200 shadow-sm"
+                        >
+                            Tambah Rekening
+                            <ArrowUpRight size={14} />
+                        </button>
+                        {onToggleRekening && (
+                            <button
+                                type="button"
+                                onClick={onToggleRekening}
+                                className="rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-600 px-3 py-2 text-xs font-semibold transition-all"
+                            >
+                                Simulasi: Isi Rekening
+                            </button>
+                        )}
+                    </div>
                 </div>
             )}
         </section>
@@ -500,10 +483,10 @@ function FormRekening({ onSimpan, fokusSignal, rekeningAda }) {
                     <ShieldCheck size={18} />
                 </span>
                 <div>
-                    <p className="text-[11px] font-bold text-secondary tracking-wider uppercase" style={HEAD_FONT}>
-                        Bank Account
+                    <p className="text-[11px] font-bold text-secondary tracking-wider uppercase">
+                        Rekening Tujuan
                     </p>
-                    <h2 className="text-xl font-bold text-primary mt-1" style={HEAD_FONT}>
+                    <h2 className="text-xl font-bold text-primary mt-1">
                         Tambah / Ganti Rekening Tujuan
                     </h2>
                 </div>
@@ -582,12 +565,11 @@ function FormRekening({ onSimpan, fokusSignal, rekeningAda }) {
             <div className="mt-4 rounded-xl bg-lightBg p-3.5 flex items-start gap-2">
                 <AlertCircle size={14} className="text-secondary mt-0.5 shrink-0" />
                 <div>
-                    <p className="text-xs font-bold text-primary" style={HEAD_FONT}>
-                        Aturan PAYOUT-08
+                    <p className="text-xs font-bold text-primary">
+                        Ketentuan Rekening
                     </p>
                     <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
-                        Mengganti rekening membuat data baru yang belum terverifikasi dan tidak mengubah rekening
-                        pada payout berjalan.
+                        Mengganti rekening memerlukan verifikasi ulang oleh tim verifikasi dan tidak memengaruhi penarikan yang sedang berjalan.
                     </p>
                 </div>
             </div>
@@ -648,10 +630,10 @@ function FormPayout({ saldo, rekening, nominal, onNominal, sukses, onAjukan }) {
                     <Coins size={18} />
                 </span>
                 <div>
-                    <p className="text-[11px] font-bold text-secondary tracking-wider uppercase" style={HEAD_FONT}>
-                        PayoutRequest
+                    <p className="text-[11px] font-bold text-secondary tracking-wider uppercase">
+                        Penarikan Dana
                     </p>
-                    <h2 className="text-xl font-bold text-primary mt-1" style={HEAD_FONT}>
+                    <h2 className="text-xl font-bold text-primary mt-1">
                         Ajukan Penarikan Dana
                     </h2>
                 </div>
@@ -739,10 +721,9 @@ function FormPayout({ saldo, rekening, nominal, onNominal, sukses, onAjukan }) {
                     </button>
                     <p
                         className="mt-3 text-xs text-secondary bg-secondary/10 rounded-xl px-3 py-2 flex items-center gap-1.5 font-semibold"
-                        style={HEAD_FONT}
                     >
                         <CheckCircle2 size={14} className="shrink-0" />
-                        Pengajuan masuk dengan status menunggu_admin dan koin dipindah ke saldo payout tertahan.
+                        Pengajuan sedang menunggu verifikasi admin keuangan dan koin telah dipindahkan ke saldo proses penarikan.
                     </p>
                 </>
             ) : bisaAjukan ? (
@@ -938,20 +919,7 @@ export default function DompetMentorPage({ initialHalaman = "dompet" }) {
     };
 
     return (
-        <div className="min-h-screen bg-lightBg" style={BODY_FONT}>
-            <style>{FONT_IMPORT}</style>
-
-            <BarSimulasi
-                halaman={halaman}
-                rekeningTerisi={Boolean(rekening)}
-                sukses={sukses}
-                onBukaPayout={bukaPayout}
-                onKembali={kembaliKeDompet}
-                onToggleRekening={toggleRekening}
-                onSimulasiSukses={simulasiSukses}
-                onReset={resetSemua}
-            />
-
+        <div className="min-h-screen bg-lightBg font-sans">
             <main className="max-w-7xl mx-auto px-4 md:px-8 py-6">
                 {halaman === "dompet" ? (
                     <div className="space-y-6">
@@ -967,8 +935,6 @@ export default function DompetMentorPage({ initialHalaman = "dompet" }) {
                     <div>
                         <HeaderPayout
                             saldo={saldo}
-                            rbac={rbac}
-                            onRbac={setRbac}
                             onKembali={kembaliKeDompet}
                         />
 
@@ -977,6 +943,7 @@ export default function DompetMentorPage({ initialHalaman = "dompet" }) {
                                 <KartuRekening
                                     rekening={rekening}
                                     onTambah={() => setFokusSignal((n) => n + 1)}
+                                    onToggleRekening={toggleRekening}
                                 />
                                 <FormPayout
                                     saldo={saldo}

@@ -148,24 +148,28 @@ function Avatar({ size = 'md', bg = 'bg-emerald-600' }) {
 
 function PageHeader({ eyebrow, title, subtitle, onBack }) {
     return (
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            {onBack && (
+                <div className="mb-4">
+                    <button
+                        type="button"
+                        onClick={onBack}
+                        className="inline-flex items-center gap-2 rounded-full border border-secondary/40 bg-white px-4 py-2 text-xs font-bold text-secondary shadow-sm transition-all hover:bg-secondary/10"
+                    >
+                        <ArrowLeft size={14} />
+                        Kembali ke Jadwal
+                    </button>
+                </div>
+            )}
             <div>
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary">
                     {eyebrow}
                 </p>
-                <h1 className="mt-3 text-3xl font-light text-primary sm:text-4xl">
+                <h1 className="mt-2 text-3xl font-light text-primary sm:text-4xl">
                     {title}
                 </h1>
-                <p className="mt-3 text-sm text-primary/70">{subtitle}</p>
+                <p className="mt-2 text-sm text-primary/70">{subtitle}</p>
             </div>
-            <button
-                type="button"
-                onClick={onBack}
-                className="flex items-center justify-center gap-2 self-start rounded-full border border-secondary bg-white px-5 py-2.5 text-sm font-bold text-secondary transition-all duration-200 hover:bg-secondary/10 sm:self-auto"
-            >
-                Kembali ke Jadwal
-                <ArrowLeft size={14} />
-            </button>
         </div>
     );
 }
@@ -203,7 +207,7 @@ function ConvStatus({ status, label }) {
 /* ============================================================
    MODE: RUANG TUNGGU
    ============================================================ */
-function RuangTunggu({ onBack, onOpenChat, onOpenModal }) {
+function RuangTunggu({ onBack, onOpenChat, onOpenModal, onOpenAjuBanding }) {
     return (
         <div className="space-y-5">
             {/* Banner sesi berlangsung */}
@@ -314,7 +318,7 @@ function RuangTunggu({ onBack, onOpenChat, onOpenModal }) {
                     </button>
                     <button
                         type="button"
-                        onClick={() => onOpenModal && onOpenModal('banding')}
+                        onClick={() => (onOpenAjuBanding ? onOpenAjuBanding() : onOpenModal && onOpenModal('banding'))}
                         className="flex items-center justify-center gap-3 rounded-full bg-secondary px-6 py-3 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:brightness-110"
                     >
                         Ajukan Pengaduan Konflik
@@ -619,7 +623,7 @@ function Obrolan({
 /* ============================================================
    KOMPONEN UTAMA
    ============================================================ */
-export default function RuangInteraksi({ onOpenModal, initialView = 'ruang-tunggu', onBackToJadwal }) {
+export default function RuangInteraksi({ onOpenModal, onOpenAjuBanding, initialView = 'ruang-tunggu', onBackToJadwal }) {
     const [viewMode, setViewMode] = useState(initialView);
     const [chatState, setChatState] = useState('aktif');
     const [activeConvId, setActiveConvId] = useState('bk-089');
@@ -704,6 +708,7 @@ export default function RuangInteraksi({ onOpenModal, initialView = 'ruang-tungg
                         onBack={onBackToJadwal || (() => { })}
                         onOpenChat={() => setViewMode('obrolan')}
                         onOpenModal={onOpenModal}
+                        onOpenAjuBanding={onOpenAjuBanding}
                     />
                 ) : (
                     <Obrolan

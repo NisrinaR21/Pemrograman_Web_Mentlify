@@ -20,12 +20,159 @@ import {
 /* ------------------------------------------------------------------ */
 /* KONSTANTA & DATA DUMMY                                              */
 /* ------------------------------------------------------------------ */
-const TOPIK_OPTIONS = [
-    'Matematika Dasar',
-    'Kalkulus Dasar',
-    'Fisika Dasar',
-    'Pemrograman Dasar',
-];
+export const FAKULTAS_DATA = {
+    FTKK: {
+        nama: 'Fakultas Teknik dan Teknologi Kemaritiman',
+        singkat: 'FTKK (Teknik & Maritim)',
+        topik: [
+            'Pemrograman Web & Algoritma',
+            'Rangkaian Listrik & Logika Digital',
+            'Kalkulus Teknik & Aljabar Linier',
+            'Hidrodinamika & Konstruksi Kapal',
+            'Termodinamika & Kinetika Kimia',
+            'Mekanika Struktur & Sipil',
+        ],
+        soalAwal: [
+            {
+                id: 101,
+                topik: 'Pemrograman Web & Algoritma',
+                text: 'Di dalam JavaScript, manakah method array yang digunakan untuk memfilter elemen berdasarkan kondisi?',
+                options: ['array.map()', 'array.filter()', 'array.reduce()', 'array.find()'],
+                correct: 1,
+                explanation: 'Method array.filter() menghasilkan array baru berisi elemen-elemen yang memenuhi kondisi pengujian.',
+                xp: 15,
+            },
+            {
+                id: 102,
+                topik: 'Kalkulus Teknik & Aljabar Linier',
+                text: 'Turunan pertama dari f(x) = 3x² + 5x adalah ...',
+                options: ['6x + 5', '3x + 5', '6x² + 5', '6x'],
+                correct: 0,
+                explanation: 'd/dx(3x²) = 6x, d/dx(5x) = 5. Maka f\'(x) = 6x + 5.',
+                xp: 15,
+            },
+        ],
+    },
+    FEBM: {
+        nama: 'Fakultas Ekonomi dan Bisnis Maritim',
+        singkat: 'FEBM (Ekonomi & Bisnis)',
+        topik: [
+            'Pengantar Akuntansi & Laporan Keuangan',
+            'Manajemen Pemasaran & Strategis',
+            'Bisnis Digital & E-Commerce',
+            'Kewirausahaan & Model Bisnis',
+            'Ekonomi Maritim & Ekspor Impor',
+        ],
+        soalAwal: [
+            {
+                id: 103,
+                topik: 'Pengantar Akuntansi & Laporan Keuangan',
+                text: 'Persamaan dasar akuntansi yang benar adalah ...',
+                options: ['Aset = Kewajiban + Ekuitas', 'Aset = Ekuitas − Kewajiban', 'Kewajiban = Aset + Ekuitas', 'Ekuitas = Aset + Utang'],
+                correct: 0,
+                explanation: 'Persamaan dasar akuntansi menyatakan bahwa total Aset selalu seimbang dengan jumlah Kewajiban ditambah Ekuitas Pemilik.',
+                xp: 15,
+            },
+        ],
+    },
+    FIKP: {
+        nama: 'Fakultas Ilmu Kelautan dan Perikanan',
+        singkat: 'FIKP (Kelautan & Perikanan)',
+        topik: [
+            'Oseanografi Fisika & Kimia Laut',
+            'Ekologi Perairan Pesisir & Terumbu Karang',
+            'Teknologi Budidaya Marikultur',
+            'Mikrobiologi Produk Hasil Perikanan',
+            'Tata Kelola & Sosial Ekonomi Pesisir',
+        ],
+        soalAwal: [
+            {
+                id: 104,
+                topik: 'Oseanografi Fisika & Kimia Laut',
+                text: 'Salinitas rata-rata air laut di perairan terbuka umumnya berkisar di angka ...',
+                options: ['10 – 15 PSU', '20 – 25 PSU', '33 – 37 PSU', '45 – 50 PSU'],
+                correct: 2,
+                explanation: 'Salinitas normal perairan laut terbuka dunia rata-rata adalah 35 PSU (antara 33 hingga 37 PSU).',
+                xp: 15,
+            },
+        ],
+    },
+    FKIP: {
+        nama: 'Fakultas Keguruan dan Ilmu Pendidikan',
+        singkat: 'FKIP (Keguruan & Pendidikan)',
+        topik: [
+            'Pendidikan Matematika: Aljabar & Kalkulus',
+            'Pendidikan Bahasa Indonesia & Sastra',
+            'English Grammar & ELT Methodology',
+            'Pembelajaran Sains Terapan',
+            'Evaluasi Belajar & Kurikulum Merdeka',
+        ],
+        soalAwal: [
+            {
+                id: 105,
+                topik: 'Pendidikan Matematika: Aljabar & Kalkulus',
+                text: 'Nilai dari lim (x→2) (x² − 4) / (x − 2) adalah ...',
+                options: ['0', '2', '4', 'Tidak terdefinisi'],
+                correct: 2,
+                explanation: 'Faktorkan (x-2)(x+2) / (x-2) = x+2. Substitusi x=2 menjadi 2+2 = 4.',
+                xp: 15,
+            },
+        ],
+    },
+    FISIP: {
+        nama: 'Fakultas Ilmu Sosial dan Ilmu Politik',
+        singkat: 'FISIP (Sosial & Politik)',
+        topik: [
+            'Tata Kelola Pemerintahan Daerah & Maritim',
+            'Kebijakan Publik & Reformasi Birokrasi',
+            'Hukum Laut & Konvensi UNCLOS 1982',
+            'Geopolitik Asia Timur & Diplomasi Maritim',
+            'Sosiologi Maritim & Komunikasi Digital',
+        ],
+        soalAwal: [
+            {
+                id: 106,
+                topik: 'Hukum Laut & Konvensi UNCLOS 1982',
+                text: 'Berdasarkan UNCLOS 1982, lebar Zona Ekonomi Eksklusif (ZEE) diukur sejauh ...',
+                options: ['12 mil laut', '24 mil laut', '200 mil laut', '350 mil laut'],
+                correct: 2,
+                explanation: 'ZEE diukur sejauh tidak melebihi 200 mil laut dari garis pangkal laut teritorial.',
+                xp: 15,
+            },
+        ],
+    },
+    FK: {
+        nama: 'Fakultas Kedokteran',
+        singkat: 'FK (Kedokteran)',
+        topik: [
+            'Anatomi Klinis & Histologi Dasar',
+            'Fisiologi Kardiovaskular & Respirasi',
+            'Biokimia Medis & Metabolisme',
+            'Farmakologi Klinis Dasar',
+            'Etika Kedokteran & Keterampilan Klinis',
+        ],
+        soalAwal: [
+            {
+                id: 107,
+                topik: 'Fisiologi Kardiovaskular & Respirasi',
+                text: 'Pacemaker alami jantung yang menghasilkan impuls denyut pertama kali adalah ...',
+                options: ['Nodus Sinoatrial (SA Node)', 'Nodus Atrioventrikular (AV Node)', 'Berkas His', 'Serabut Purkinje'],
+                correct: 0,
+                explanation: 'Nodus SA (Sinoatrial) berfungsi sebagai perintis ritme denyut jantung alami normal (pacemaker primer).',
+                xp: 15,
+            },
+        ],
+    },
+};
+
+export const INITIAL_BANK = Object.entries(FAKULTAS_DATA).flatMap(([fKey, fVal]) =>
+    fVal.soalAwal.map((s) => ({
+        ...s,
+        fakultasKey: fKey,
+        fakultasNama: fVal.nama,
+    }))
+);
+
 const OPTION_LETTERS = ['A', 'B', 'C', 'D'];
 const XP_MIN = 5;
 const XP_MAX = 20;
@@ -36,39 +183,6 @@ const INITIAL_MISSIONS = [
     { id: 1, title: 'Lengkapi Profil & Pilih Topik', xp: 20, claimed: false },
     { id: 2, title: 'Atur Jadwal Luang Mingguan', xp: 20, claimed: false },
     { id: 3, title: 'Top-Up atau Pesan Sesi Perdana', xp: 50, claimed: false },
-];
-
-const INITIAL_BANK = [
-    {
-        id: 101,
-        topik: 'Matematika Dasar',
-        text: 'Hasil dari ∫ 2x dx adalah ...',
-        options: ['2x + C', 'x² + C', 'x² / 2 + C', '2x² + C'],
-        correct: 1,
-        explanation:
-            'Integral dari 2x terhadap x adalah x² + C, karena turunan dari x² adalah 2x.',
-        xp: 15,
-    },
-    {
-        id: 102,
-        topik: 'Kalkulus Dasar',
-        text: 'Turunan pertama dari f(x) = 3x² + 5x adalah ...',
-        options: ['6x + 5', '3x + 5', '6x² + 5', '6x + 5x'],
-        correct: 0,
-        explanation:
-            'Turunkan tiap suku: 3x² menjadi 6x, dan 5x menjadi 5, sehingga f\'(x) = 6x + 5.',
-        xp: 10,
-    },
-    {
-        id: 103,
-        topik: 'Kalkulus Dasar',
-        text: 'Nilai dari lim x→2 (x² − 4) / (x − 2) adalah ...',
-        options: ['0', '2', '4', 'Tidak terdefinisi'],
-        correct: 2,
-        explanation:
-            'Faktorkan pembilang menjadi (x − 2)(x + 2), coret (x − 2), sisa x + 2. Untuk x = 2 hasilnya 4.',
-        xp: 20,
-    },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -121,7 +235,7 @@ function ModalShell({ onClose, maxWidth, children }) {
 /* ------------------------------------------------------------------ */
 /* MODAL KUIS HARIAN (MENTEE)                                          */
 /* ------------------------------------------------------------------ */
-function QuizModal({ questions, existingResult, onClose, onFinish }) {
+export function QuizModal({ questions, existingResult, onClose, onFinish }) {
     const [index, setIndex] = useState(0);
     const [selected, setSelected] = useState(null);
     const [checked, setChecked] = useState(false);
@@ -278,16 +392,30 @@ function QuizModal({ questions, existingResult, onClose, onFinish }) {
 /* ------------------------------------------------------------------ */
 /* MODAL QUESTION BUILDER (MENTOR)                                     */
 /* ------------------------------------------------------------------ */
-function QuestionBuilderModal({ editing, onClose, onSubmit }) {
-    const [topik, setTopik] = useState(editing ? editing.topik : TOPIK_OPTIONS[0]);
+function QuestionBuilderModal({ editing, defaultFakultasKey = 'FTKK', onClose, onSubmit }) {
+    const [fakultasKey, setFakultasKey] = useState(
+        editing?.fakultasKey || defaultFakultasKey
+    );
+    const availableTopics = FAKULTAS_DATA[fakultasKey]?.topik || FAKULTAS_DATA.FTKK.topik;
+    const [topik, setTopik] = useState(
+        editing ? editing.topik : (availableTopics[0] || '')
+    );
     const [text, setText] = useState(editing ? editing.text : '');
     const [options, setOptions] = useState(
-        editing ? [...editing.options] : ['2x + C', 'x² + C', 'x² / 2 + C', '2x² + C']
+        editing ? [...editing.options] : ['Opsi A', 'Opsi B', 'Opsi C', 'Opsi D']
     );
-    const [correct, setCorrect] = useState(editing ? editing.correct : 1);
+    const [correct, setCorrect] = useState(editing ? editing.correct : 0);
     const [explanation, setExplanation] = useState(editing ? editing.explanation : '');
-    const [xp, setXp] = useState(editing ? editing.xp : 17);
+    const [xp, setXp] = useState(editing ? editing.xp : 15);
     const [error, setError] = useState('');
+
+    const handleFakultasChange = (newKey) => {
+        setFakultasKey(newKey);
+        const newTopics = FAKULTAS_DATA[newKey]?.topik || [];
+        if (newTopics.length > 0) {
+            setTopik(newTopics[0]);
+        }
+    };
 
     const setOptionAt = (i, value) => {
         setOptions((prev) => prev.map((o, idx) => (idx === i ? value : o)));
@@ -305,6 +433,8 @@ function QuestionBuilderModal({ editing, onClose, onSubmit }) {
         setError('');
         onSubmit({
             id: editing ? editing.id : Date.now(),
+            fakultasKey,
+            fakultasNama: FAKULTAS_DATA[fakultasKey]?.nama || '',
             topik,
             text: text.trim(),
             options: options.map((o) => o.trim()),
@@ -334,25 +464,48 @@ function QuestionBuilderModal({ editing, onClose, onSubmit }) {
                 </div>
             </div>
 
-            {/* topik */}
-            <div className="mt-6">
-                <label className="mb-1.5 block text-sm font-semibold text-primary">Topik</label>
-                <div className="relative">
-                    <select
-                        value={topik}
-                        onChange={(e) => setTopik(e.target.value)}
-                        className="w-full appearance-none rounded-full border border-accent bg-lightBg px-4 py-2.5 pr-10 text-sm font-bold text-primary transition-all duration-200 focus:border-secondary focus:outline-none"
-                    >
-                        {TOPIK_OPTIONS.map((t) => (
-                            <option key={t} value={t}>
-                                {t}
-                            </option>
-                        ))}
-                    </select>
-                    <ChevronDown
-                        size={16}
-                        className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-primary"
-                    />
+            {/* pilihan fakultas & topik */}
+            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                    <label className="mb-1.5 block text-sm font-semibold text-primary">Fakultas</label>
+                    <div className="relative">
+                        <select
+                            value={fakultasKey}
+                            onChange={(e) => handleFakultasChange(e.target.value)}
+                            className="w-full appearance-none rounded-full border border-accent bg-lightBg px-4 py-2.5 pr-10 text-sm font-bold text-primary transition-all duration-200 focus:border-secondary focus:outline-none"
+                        >
+                            {Object.entries(FAKULTAS_DATA).map(([key, item]) => (
+                                <option key={key} value={key}>
+                                    {item.singkat}
+                                </option>
+                            ))}
+                        </select>
+                        <ChevronDown
+                            size={16}
+                            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-primary"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label className="mb-1.5 block text-sm font-semibold text-primary">Topik Bimbingan</label>
+                    <div className="relative">
+                        <select
+                            value={topik}
+                            onChange={(e) => setTopik(e.target.value)}
+                            className="w-full appearance-none rounded-full border border-accent bg-lightBg px-4 py-2.5 pr-10 text-sm font-bold text-primary transition-all duration-200 focus:border-secondary focus:outline-none"
+                        >
+                            {availableTopics.map((t) => (
+                                <option key={t} value={t}>
+                                    {t}
+                                </option>
+                            ))}
+                        </select>
+                        <ChevronDown
+                            size={16}
+                            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-primary"
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -463,6 +616,7 @@ function MisiDanKuis({ userRole = 'mentee', showSimulation = true }) {
 
     // state mentor
     const [bank, setBank] = useState(INITIAL_BANK);
+    const [selectedFakultas, setSelectedFakultas] = useState('ALL');
     const [builderOpen, setBuilderOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
@@ -573,77 +727,14 @@ function MisiDanKuis({ userRole = 'mentee', showSimulation = true }) {
     };
 
     const editingQuestion = bank.find((b) => b.id === editingId) || null;
+    const displayedBank =
+        selectedFakultas === 'ALL'
+            ? bank
+            : bank.filter((b) => b.fakultasKey === selectedFakultas);
 
     return (
         <section className="w-full">
-            {/* ---------------- BAR SIMULASI ---------------- */}
-            {showSimulation && (
-                <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-primary/30 bg-white px-3 py-2">
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
-                        <Wrench size={14} />
-                        🛠️ Simulasi Presentasi:
-                    </span>
-
-                    <span className="text-[11px] font-semibold text-slate-500">Simulasi State</span>
-
-                    {role === 'mentee' ? (
-                        <>
-                            <button
-                                type="button"
-                                onClick={() => setQuizOpen(true)}
-                                className="rounded-full border border-accent bg-white px-3 py-1 text-xs font-medium text-secondary transition-all duration-200 hover:bg-slate-50"
-                            >
-                                Buka Kuis
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setQuizOpen(false)}
-                                className="rounded-full border border-accent bg-white px-3 py-1 text-xs font-medium text-secondary transition-all duration-200 hover:bg-slate-50"
-                            >
-                                Tutup Kuis
-                            </button>
-                            <button
-                                type="button"
-                                onClick={claimAllMissions}
-                                className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-white shadow-sm transition-all duration-200 hover:brightness-110"
-                            >
-                                Klaim Semua XP
-                            </button>
-                            <button
-                                type="button"
-                                onClick={resetMentee}
-                                className="rounded-full border border-red-400 bg-white px-3 py-1 text-xs font-medium text-red-500 transition-all duration-200 hover:bg-red-50"
-                            >
-                                Reset XP
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <button
-                                type="button"
-                                onClick={() => openBuilder(null)}
-                                className="rounded-full border border-accent bg-white px-3 py-1 text-xs font-medium text-secondary transition-all duration-200 hover:bg-slate-50"
-                            >
-                                Buka Question Builder
-                            </button>
-                            <button
-                                type="button"
-                                onClick={closeBuilder}
-                                className="rounded-full border border-accent bg-white px-3 py-1 text-xs font-medium text-secondary transition-all duration-200 hover:bg-slate-50"
-                            >
-                                Tutup Builder
-                            </button>
-                            <button
-                                type="button"
-                                onClick={resetBank}
-                                className="rounded-full border border-red-400 bg-white px-3 py-1 text-xs font-medium text-red-500 transition-all duration-200 hover:bg-red-50"
-                            >
-                                Reset Bank Soal
-                            </button>
-                        </>
-                    )}
-                </div>
-            )}
+            {/* ================= TAMPILAN MENTOR / MENTEE ================= */}
 
             {/* ================= TAMPILAN MENTEE ================= */}
             {role === 'mentee' && (
@@ -763,33 +854,30 @@ function MisiDanKuis({ userRole = 'mentee', showSimulation = true }) {
                         )}
                     </div>
 
-                    {/* tombol kuis harian */}
-                    <button
-                        type="button"
-                        onClick={() => setQuizOpen(true)}
-                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-white/40 px-4 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-white/10"
-                    >
-                        <BookOpen size={16} />
-                        {quizResult ? 'Lihat Hasil Kuis Harian' : 'Mulai Kuis Harian'}
-                        {quizResult && <CheckCircle2 size={16} className="text-accentYellow" />}
-                    </button>
-
                     {/* tombol peti poin */}
                     <button
                         type="button"
                         disabled={!allClaimed || chestClaimed}
                         onClick={claimChest}
-                        className={`mt-3 w-full py-3 text-sm font-bold ${!allClaimed || chestClaimed
-                                ? 'rounded-full bg-slate-200 text-slate-400 cursor-not-allowed select-none'
-                                : 'rounded-full bg-white text-secondary shadow-sm transition-all duration-200 hover:scale-[1.02] hover:brightness-95'
-                            } flex items-center justify-center gap-2 transition-all duration-200`}
+                        className={`mt-4 w-full py-3.5 text-sm font-bold flex items-center justify-center gap-2 transition-all duration-300 ${
+                            chestClaimed
+                                ? 'rounded-full bg-white/20 text-white/50 cursor-not-allowed select-none'
+                                : allClaimed
+                                ? 'rounded-full bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300 text-primary shadow-lg ring-4 ring-amber-300/40 animate-pulse hover:scale-105 hover:brightness-105 cursor-pointer'
+                                : 'rounded-full bg-white/10 text-white/40 cursor-not-allowed select-none'
+                        }`}
                     >
                         {chestClaimed ? 'Peti Poin Sudah Diklaim' : 'Klaim Peti Poin'}
-                        <Sparkles size={16} />
+                        <Sparkles size={18} className={allClaimed && !chestClaimed ? 'animate-spin' : ''} />
                     </button>
                     {!allClaimed && (
                         <p className="mt-2 text-center text-xs text-white/70">
                             Klaim semua misi untuk membuka peti poin.
+                        </p>
+                    )}
+                    {allClaimed && !chestClaimed && (
+                        <p className="mt-2 text-center text-xs font-bold text-accentYellow animate-bounce">
+                            ✨ Semua misi selesai! Buka peti poin sekarang untuk bonus +10 XP!
                         </p>
                     )}
                 </div>
@@ -797,7 +885,7 @@ function MisiDanKuis({ userRole = 'mentee', showSimulation = true }) {
 
             {/* ================= TAMPILAN MENTOR ================= */}
             {role === 'mentor' && (
-                <div className="mx-auto w-full max-w-2xl rounded-2xl border border-accent/70 bg-white p-5 shadow-sm transition-all duration-200 hover:border-accent">
+                <div id="bank-soal-mentor" className="mx-auto w-full max-w-2xl rounded-2xl border border-accent/70 bg-white p-5 shadow-sm transition-all duration-200 hover:border-accent">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
                             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-lightBg text-secondary">
@@ -809,7 +897,7 @@ function MisiDanKuis({ userRole = 'mentee', showSimulation = true }) {
                                 </p>
                                 <h2 className="text-xl font-extrabold text-primary">Bank Soal Latihan</h2>
                                 <p className="text-xs text-slate-500">
-                                    {bank.length} soal tersedia untuk mentee
+                                    {displayedBank.length} soal ditampilkan · {bank.length} total soal
                                 </p>
                             </div>
                         </div>
@@ -823,17 +911,52 @@ function MisiDanKuis({ userRole = 'mentee', showSimulation = true }) {
                         </button>
                     </div>
 
-                    {bank.length === 0 ? (
+                    {/* Filter Fakultas */}
+                    <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl bg-lightBg p-2.5">
+                        <span className="text-xs font-bold text-primary">Fakultas:</span>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                            <button
+                                type="button"
+                                onClick={() => setSelectedFakultas('ALL')}
+                                className={`rounded-full px-3 py-1 text-xs font-semibold transition-all ${
+                                    selectedFakultas === 'ALL'
+                                        ? 'bg-secondary text-white shadow-sm'
+                                        : 'border border-accent bg-white text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                Semua ({bank.length})
+                            </button>
+                            {Object.entries(FAKULTAS_DATA).map(([fKey, fVal]) => {
+                                const count = bank.filter((b) => b.fakultasKey === fKey).length;
+                                return (
+                                    <button
+                                        key={fKey}
+                                        type="button"
+                                        onClick={() => setSelectedFakultas(fKey)}
+                                        className={`rounded-full px-3 py-1 text-xs font-semibold transition-all ${
+                                            selectedFakultas === fKey
+                                                ? 'bg-secondary text-white shadow-sm'
+                                                : 'border border-accent bg-white text-slate-600 hover:bg-slate-50'
+                                        }`}
+                                    >
+                                        {fKey} ({count})
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {displayedBank.length === 0 ? (
                         <div className="mt-5 rounded-xl border border-dashed border-accent bg-lightBg p-6 text-center">
                             <BookOpen size={28} className="mx-auto mb-2 text-secondary" />
-                            <p className="text-sm font-semibold text-primary">Belum ada soal</p>
+                            <p className="text-sm font-semibold text-primary">Belum ada soal untuk fakultas ini</p>
                             <p className="mt-1 text-xs text-slate-500">
-                                Klik "Buat Soal Baru" untuk menerbitkan soal latihan pertamamu.
+                                Klik "Buat Soal Baru" untuk menerbitkan soal latihan di fakultas ini.
                             </p>
                         </div>
                     ) : (
                         <ul className="mt-5 space-y-3">
-                            {bank.map((b, i) => (
+                            {displayedBank.map((b, i) => (
                                 <li
                                     key={b.id}
                                     className="rounded-xl border border-accent/50 bg-[#F8FAF9] p-3 transition-all duration-200 hover:border-accent"
@@ -844,6 +967,11 @@ function MisiDanKuis({ userRole = 'mentee', showSimulation = true }) {
                                         </span>
                                         <div className="min-w-0 flex-1">
                                             <div className="flex flex-wrap items-center gap-2">
+                                                {b.fakultasKey && (
+                                                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                                                        {b.fakultasKey}
+                                                    </span>
+                                                )}
                                                 <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">
                                                     {b.topik}
                                                 </span>
@@ -900,6 +1028,7 @@ function MisiDanKuis({ userRole = 'mentee', showSimulation = true }) {
                 <QuestionBuilderModal
                     key={editingId === null ? 'baru' : editingId}
                     editing={editingQuestion}
+                    defaultFakultasKey={selectedFakultas === 'ALL' ? 'FTKK' : selectedFakultas}
                     onClose={closeBuilder}
                     onSubmit={submitQuestion}
                 />

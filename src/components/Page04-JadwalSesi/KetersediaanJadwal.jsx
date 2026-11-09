@@ -125,7 +125,7 @@ function SlotCard({ slot, onToggle, onDelete }) {
 /* ============================================================
    KOMPONEN UTAMA
    ============================================================ */
-export default function KetersediaanJadwal() {
+export default function KetersediaanJadwal({ onBack }) {
     const [activeDay, setActiveDay] = useState('Rabu');
     const [slotsByDay, setSlotsByDay] = useState(INITIAL_SLOTS);
 
@@ -162,33 +162,31 @@ export default function KetersediaanJadwal() {
     return (
         <div className="min-h-screen bg-lightBg p-4 sm:p-8">
             <div className="mx-auto max-w-5xl">
+                {/* Tombol Kembali di kiri (selaras semua page) */}
+                <div className="mb-4">
+                    <button
+                        type="button"
+                        onClick={onBack}
+                        className="inline-flex items-center gap-2 rounded-full border border-secondary/40 bg-white px-4 py-2 text-xs font-bold text-secondary shadow-sm transition-all hover:bg-secondary/10"
+                    >
+                        <ArrowLeft size={14} />
+                        Kembali ke Jadwal Bimbingan
+                    </button>
+                </div>
+
                 {/* Header halaman */}
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary">
                     Ketersediaan Jadwal
                 </p>
 
-                <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <h1 className="text-3xl font-light text-primary sm:text-4xl">
                             Manajemen Ketersediaan Jadwal
                         </h1>
-                        <p className="mt-3 text-sm text-primary/70">
+                        <p className="mt-2 text-sm text-primary/70">
                             Atur slot waktu mingguan yang dapat dipilih oleh calon Mentee.
                         </p>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2.5 text-sm font-bold text-white shadow-sm">
-                            <GraduationCap size={16} />
-                            Role: Mentor
-                        </span>
-                        <button
-                            type="button"
-                            className="flex items-center gap-2 rounded-full border border-secondary bg-white px-5 py-2.5 text-sm font-bold text-secondary transition-all duration-200 hover:bg-secondary/10"
-                        >
-                            Kembali
-                            <ArrowLeft size={14} />
-                        </button>
                     </div>
                 </div>
 

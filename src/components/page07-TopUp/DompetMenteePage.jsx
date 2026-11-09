@@ -17,12 +17,11 @@ import {
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
-/*  Font (sesuai Figma: Montserrat untuk judul, Merriweather untuk isi) */
+/*  Font styling (selaras dengan font-sans sistem Mentlify)            */
 /* ------------------------------------------------------------------ */
-const FONT_IMPORT =
-    "@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Montserrat:wght@500;600;700;800&display=swap');";
-const HEAD_FONT = { fontFamily: "'Montserrat', 'Segoe UI', sans-serif" };
-const BODY_FONT = { fontFamily: "'Merriweather', Georgia, serif" };
+const FONT_IMPORT = "";
+const HEAD_FONT = {};
+const BODY_FONT = {};
 
 /* ------------------------------------------------------------------ */
 /*  Data dummy                                                         */
@@ -662,21 +661,7 @@ export default function DompetMenteePage() {
     };
 
     return (
-        <div className="min-h-screen bg-lightBg" style={BODY_FONT}>
-            <style>{FONT_IMPORT}</style>
-
-            <BarSimulasi
-                filterAktif={filterAktif}
-                onFilter={pilihFilter}
-                onBukaModal={bukaModal}
-                onTutupModal={tutupModal}
-                onPercepatTimer={() => setSisaDetik(5)}
-                onKosongkanRiwayat={() => setRiwayatKosong((v) => !v)}
-                onResetSemua={resetSemua}
-                modalTerbuka={modalTerbuka}
-                riwayatKosong={riwayatKosong}
-            />
-
+        <div className="min-h-screen bg-lightBg font-sans">
             <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-6">
                 <BannerKoin onTopUp={scrollKePaket} />
                 <UrutanPromo />

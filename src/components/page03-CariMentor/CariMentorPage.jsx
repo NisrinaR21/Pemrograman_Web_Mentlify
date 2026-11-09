@@ -31,7 +31,36 @@ import {
     Music,
     GraduationCap,
     User,
+    Wallet,
 } from 'lucide-react';
+
+import umrah01 from '../../assets/umrah-01.png';
+import umrah02 from '../../assets/umrah-02.png';
+import umrah03 from '../../assets/umrah-03.png';
+import umrah04 from '../../assets/umrah-04.png';
+import umrah05 from '../../assets/umrah-05.png';
+import umrah06 from '../../assets/umrah-06.png';
+import umrah07 from '../../assets/umrah-07.png';
+import umrah08 from '../../assets/umrah-08.png';
+import umrah09 from '../../assets/umrah-09.png';
+import umrah10 from '../../assets/umrah-10.png';
+import umrah11 from '../../assets/umrah-11.png';
+import umrah12 from '../../assets/umrah-12.png';
+
+const MENTOR_AVATARS = {
+    1: umrah01,
+    2: umrah02,
+    3: umrah03,
+    4: umrah04,
+    5: umrah05,
+    6: umrah06,
+    7: umrah07,
+    8: umrah08,
+    9: umrah09,
+    10: umrah10,
+    11: umrah11,
+    12: umrah12,
+};
 
 /* =========================================================
    KONSTANTA & DATA DUMMY
@@ -40,7 +69,7 @@ import {
 const MENTOR_PER_HALAMAN = 6;
 const KOIN_PROMO = 5; // koin promo yang dimiliki pengguna (dummy)
 const SALDO_CUKUP = 50; // saldo utama pengguna (dummy)
-const SALDO_KURANG = 10; // dipakai untuk simulasi saldo tidak cukup
+const SALDO_KURANG = 2; // saldo tidak cukup (kurang dari tarif terendah 15 koin)
 
 const DAFTAR_TOPIK = ['Semua Topik', 'UI/UX', 'Product Design', 'Frontend', 'Data', 'Penelitian'];
 
@@ -355,18 +384,21 @@ const DAFTAR_MENTOR = [
    KOMPONEN KECIL BANTUAN
    ========================================================= */
 
-function AvatarMentor({ mentor, ukuran = 'w-[88px] h-[88px]', ukuranIkon = 40, lencana = true }) {
-    const Ikon = mentor.ikon;
+function AvatarMentor({ mentor, ukuran = 'w-[88px] h-[88px]', lencana = true }) {
+    const avatarSrc = mentor.avatar || MENTOR_AVATARS[mentor.id] || umrah01;
     return (
         <div className="relative shrink-0">
             <div
-                className={`${ukuran} rounded-full border-4 border-white flex items-center justify-center text-white shadow-md`}
-                style={{ backgroundColor: mentor.warna }}
+                className={`${ukuran} rounded-full border-4 border-white overflow-hidden shadow-md bg-white`}
             >
-                <Ikon size={ukuranIkon} strokeWidth={1.8} />
+                <img
+                    src={avatarSrc}
+                    alt={mentor.nama}
+                    className="w-full h-full object-cover"
+                />
             </div>
             {lencana && (
-                <span className="absolute bottom-0 right-0 rounded-full bg-secondary text-white w-5 h-5 flex items-center justify-center border-2 border-white">
+                <span className="absolute bottom-0 right-0 rounded-full bg-secondary text-white w-5 h-5 flex items-center justify-center border-2 border-white shadow-sm">
                     <Check size={10} strokeWidth={3} />
                 </span>
             )}
@@ -483,7 +515,7 @@ function FilterTopik({ topikAktif, onPilih }) {
    SUB-KOMPONEN 2: GridMentor
    ========================================================= */
 
-function KartuMentor({ mentor, tersimpan, onSimpan, onLihatDetail }) {
+function KartuMentor({ mentor, tersimpan, saldoUtama, onSimpan, onLihatDetail }) {
     const gelap = mentor.banner === 'gelap';
 
     return (
@@ -529,7 +561,13 @@ function KartuMentor({ mentor, tersimpan, onSimpan, onLihatDetail }) {
                 </div>
                 <div className="py-3 text-center">
                     <p className="text-sm font-bold text-primary">{mentor.tarif} Koin</p>
-                    <p className="text-xs text-slate-500 mt-0.5">Per Sesi</p>
+                    <p className="text-[10px] font-semibold mt-0.5">
+                        {saldoUtama !== undefined && saldoUtama < mentor.tarif ? (
+                            <span className="text-red-500 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">Kurang</span>
+                        ) : (
+                            <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Cukup</span>
+                        )}
+                    </p>
                 </div>
             </div>
 
@@ -559,7 +597,7 @@ function KartuMentor({ mentor, tersimpan, onSimpan, onLihatDetail }) {
     );
 }
 
-function GridMentor({ daftar, simpanan, onSimpan, onLihatDetail, onResetFilter }) {
+function GridMentor({ daftar, simpanan, saldoUtama, onSimpan, onLihatDetail, onResetFilter }) {
     if (daftar.length === 0) {
         return (
             <div className="bg-white rounded-2xl border border-accent/70 shadow-sm p-10 flex flex-col items-center text-center transition-all duration-200">
@@ -588,6 +626,7 @@ function GridMentor({ daftar, simpanan, onSimpan, onLihatDetail, onResetFilter }
                     key={mentor.id}
                     mentor={mentor}
                     tersimpan={simpanan.includes(mentor.id)}
+                    saldoUtama={saldoUtama}
                     onSimpan={onSimpan}
                     onLihatDetail={onLihatDetail}
                 />
@@ -882,36 +921,58 @@ function ModalDetailMentor({ mentor, hariFilter, saldoUtama, initialSukses = fal
                                     <span className="text-lg font-bold text-secondary">{totalEscrow} Koin</span>
                                 </div>
 
-                                <p className="text-xs text-slate-500 mt-2">Saldo utama kamu saat ini: {saldoUtama} Koin</p>
+                                <div className="mt-3 flex items-center justify-between text-xs">
+                                    <span className="text-slate-500">Saldo Anda saat ini:</span>
+                                    <span className={`font-bold ${saldoCukup ? 'text-secondary' : 'text-red-500'}`}>
+                                        {saldoUtama} Koin {saldoCukup ? '(Cukup)' : '(Tidak Cukup)'}
+                                    </span>
+                                </div>
                             </div>
 
-                            {/* Status pengajuan */}
+                            {/* Status pengajuan / Peringatan saldo */}
                             {sukses && (
-                                <p className="mt-3 text-sm font-semibold text-secondary flex items-center gap-1.5">
-                                    <Check size={14} />
-                                    Pengajuan berhasil dikirim ke mentor.
-                                </p>
-                            )}
-                            {!saldoCukup && (
-                                <p className="mt-3 text-sm font-semibold text-red-500 flex items-center gap-1.5">
-                                    <AlertCircle size={14} />
-                                    Saldo utama tidak cukup. Lakukan <Link to="/top-up" className="underline font-bold hover:text-red-700">Top Up</Link> terlebih dahulu.
-                                </p>
+                                <div className="mt-3 rounded-2xl border border-emerald-300 bg-emerald-50 p-3.5 text-emerald-800 text-xs flex items-center gap-2 font-bold">
+                                    <Check size={16} className="text-emerald-600 shrink-0" />
+                                    Pengajuan bimbingan berhasil dikirim ke mentor!
+                                </div>
                             )}
 
-                            {/* Tombol ajukan */}
-                            <button
-                                type="button"
-                                onClick={ajukan}
-                                disabled={!saldoCukup}
-                                className={`mt-4 w-full ${saldoCukup
-                                        ? 'rounded-full bg-secondary hover:brightness-110 text-white font-bold px-4 py-3 text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-sm'
-                                        : 'rounded-full bg-slate-200 text-slate-400 font-bold px-4 py-3 text-sm flex items-center justify-center gap-2 cursor-not-allowed select-none'
-                                    }`}
-                            >
-                                Ajukan Bimbingan
-                                <ArrowUpRight size={15} />
-                            </button>
+                            {!saldoCukup && (
+                                <div className="mt-3 rounded-2xl border border-red-300 bg-red-50 p-3.5 text-red-700 text-xs">
+                                    <div className="flex items-start gap-2.5">
+                                        <AlertCircle size={18} className="text-red-500 shrink-0 mt-0.5" />
+                                        <div>
+                                            <p className="font-bold text-red-800 text-sm">Saldo Koin Tidak Cukup!</p>
+                                            <p className="mt-1 text-red-600">
+                                                Dibutuhkan <strong>{saldoTerpotong} Koin</strong>, sedangkan saldo Anda saat ini hanya <strong>{saldoUtama} Koin</strong>.
+                                            </p>
+                                            <p className="mt-1 font-semibold text-red-700">
+                                                Kekurangan: <strong>{saldoTerpotong - saldoUtama} Koin</strong>.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Tombol aksi */}
+                            {saldoCukup ? (
+                                <button
+                                    type="button"
+                                    onClick={ajukan}
+                                    className="mt-4 w-full rounded-full bg-secondary hover:brightness-110 text-white font-bold px-4 py-3 text-sm flex items-center justify-center gap-2 shadow-sm transition-all duration-200"
+                                >
+                                    Ajukan Bimbingan
+                                    <ArrowUpRight size={15} />
+                                </button>
+                            ) : (
+                                <Link
+                                    to="/top-up"
+                                    className="mt-4 w-full rounded-full bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-3 text-sm flex items-center justify-center gap-2 shadow-md transition-all duration-200 hover:scale-[1.01]"
+                                >
+                                    Top Up Koin Sekarang (Kurang {saldoTerpotong - saldoUtama} Koin)
+                                    <ArrowUpRight size={15} />
+                                </Link>
+                            )}
 
                             <p className="text-xs text-slate-500 text-center mt-3 flex items-center justify-center gap-1.5">
                                 <Lock size={12} />
@@ -929,14 +990,14 @@ function ModalDetailMentor({ mentor, hariFilter, saldoUtama, initialSukses = fal
    KOMPONEN UTAMA (merakit seluruh halaman)
    ========================================================= */
 
-export default function CariMentorPage() {
+export default function CariMentorPage({ menteeSaldo = 'cukup' }) {
     const [kataKunci, setKataKunci] = useState('');
     const [hari, setHari] = useState('semua');
     const [urutan, setUrutan] = useState('kecocokan');
     const [topikAktif, setTopikAktif] = useState('Semua Topik');
     const [halaman, setHalaman] = useState(1);
     const [simpanan, setSimpanan] = useState([]);
-    const [saldoUtama, setSaldoUtama] = useState(SALDO_CUKUP);
+    const saldoUtama = menteeSaldo === 'kurang' ? SALDO_KURANG : SALDO_CUKUP;
     const [modal, setModal] = useState(null); // { mentorId, sukses, kunci } | null
     const [penghitungModal, setPenghitungModal] = useState(0);
 
@@ -991,59 +1052,14 @@ export default function CariMentorPage() {
     const resetSimulasi = () => {
         resetFilter();
         setSimpanan([]);
-        setSaldoUtama(SALDO_CUKUP);
         setModal(null);
     };
 
     const mentorModal = modal ? DAFTAR_MENTOR.find((m) => m.id === modal.mentorId) : null;
 
-    const tombolSimulasi = (aktif) =>
-        `rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${aktif
-            ? 'bg-secondary text-white shadow-sm hover:brightness-110'
-            : 'border border-accent bg-white text-secondary hover:bg-slate-50'
-        }`;
-
     return (
         <div className="bg-lightBg min-h-screen px-4 py-6 md:px-8">
             <div className="max-w-6xl mx-auto space-y-5">
-                {/* ===== BAR SIMULASI PRESENTASI ===== */}
-                <div className="rounded-xl border border-dashed border-accent bg-white px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-2">
-                    <span className="text-xs font-bold text-primary">🛠️ Simulasi Presentasi:</span>
-
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pop-up</span>
-                        <button type="button" onClick={() => bukaModal(1, false)} className={tombolSimulasi(modal && !modal.sukses)}>
-                            Modal Detail Mentor
-                        </button>
-                        <button type="button" onClick={() => bukaModal(1, true)} className={tombolSimulasi(modal && modal.sukses)}>
-                            Pengajuan Berhasil
-                        </button>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Filter Topik</span>
-                        {['Semua Topik', 'UI/UX', 'Data'].map((t) => (
-                            <button key={t} type="button" onClick={() => ubahFilter(setTopikAktif)(t)} className={tombolSimulasi(topikAktif === t)}>
-                                {t}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Saldo</span>
-                        <button type="button" onClick={() => setSaldoUtama(SALDO_CUKUP)} className={tombolSimulasi(saldoUtama === SALDO_CUKUP)}>
-                            Cukup
-                        </button>
-                        <button type="button" onClick={() => setSaldoUtama(SALDO_KURANG)} className={tombolSimulasi(saldoUtama === SALDO_KURANG)}>
-                            Tidak Cukup
-                        </button>
-                    </div>
-
-                    <button type="button" onClick={resetSimulasi} className={tombolSimulasi(false)}>
-                        Reset Semua
-                    </button>
-                </div>
-
                 <BannerPencarian
                     kataKunci={kataKunci}
                     onKataKunci={ubahFilter(setKataKunci)}
@@ -1067,6 +1083,7 @@ export default function CariMentorPage() {
                 <GridMentor
                     daftar={daftarHalaman}
                     simpanan={simpanan}
+                    saldoUtama={saldoUtama}
                     onSimpan={togglSimpan}
                     onLihatDetail={(id) => bukaModal(id, false)}
                     onResetFilter={resetFilter}

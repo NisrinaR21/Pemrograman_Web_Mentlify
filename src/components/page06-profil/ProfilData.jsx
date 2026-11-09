@@ -143,11 +143,10 @@ function HeaderProfil({ userRole, onGantiRole, isEditing }) {
                                     key={role.id}
                                     type="button"
                                     onClick={() => onGantiRole(role.id)}
-                                    className={`rounded-full px-5 py-1.5 text-sm font-bold transition-all duration-200 ${
-                                        isAktif
+                                    className={`rounded-full px-5 py-1.5 text-sm font-bold transition-all duration-200 ${isAktif
                                             ? 'bg-secondary text-white shadow-sm hover:brightness-110'
                                             : 'text-slate-500 hover:text-secondary'
-                                    }`}
+                                        }`}
                                 >
                                     {role.label}
                                 </button>
@@ -347,11 +346,10 @@ function FormBiodata({ userRole, isEditing, onStartEdit, onEndEdit }) {
                                             type="button"
                                             onClick={() => ubahField('avatarId', avatar.id)}
                                             aria-label={`Pilih ${avatar.nama}`}
-                                            className={`relative rounded-full p-0.5 transition-all duration-200 hover:scale-110 ${
-                                                terpilih
+                                            className={`relative rounded-full p-0.5 transition-all duration-200 hover:scale-110 ${terpilih
                                                     ? 'ring-4 ring-accent shadow-md scale-105'
                                                     : 'opacity-85 hover:opacity-100 hover:ring-2 hover:ring-white/80'
-                                            }`}
+                                                }`}
                                         >
                                             <AvatarBulat avatarId={avatar.id} ukuran="w-12 h-12" />
                                             {terpilih && (

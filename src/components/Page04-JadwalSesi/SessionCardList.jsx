@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     ArrowUpRight,
     BookOpen,
@@ -11,6 +12,7 @@ import {
     Video,
     X,
     User,
+    Calendar,
 } from 'lucide-react';
 
 /* ============================================================
@@ -144,10 +146,10 @@ const SIMULASI_KONDISI = [
 ];
 
 const FILTER_TABS = [
-    { key: 'semua', label: 'Semua' },
+    { key: 'semua', label: 'Semua Sesi' },
+    { key: 'menunggu', label: 'Menunggu Respons' },
     { key: 'dikonfirmasi', label: 'Dikonfirmasi' },
-    { key: 'menunggu', label: 'Menunggu' },
-    { key: 'selesai', label: 'Ditolak / Selesai' },
+    { key: 'selesai', label: 'Riwayat (Selesai/Batal)' },
 ];
 
 /* ============================================================
@@ -504,9 +506,18 @@ function SessionCard({ role, data, onOpenModal, onNavigateRuangInteraksi }) {
 /* ============================================================
    TAMPILAN KOSONG
    ============================================================ */
-function EmptyState({ role }) {
-    const cfg = EMPTY_STATES[role];
+function EmptyState({ role, onOpenKetersediaan }) {
+    const navigate = useNavigate();
+    const cfg = EMPTY_STATES[role] || EMPTY_STATES.mentee;
     const Icon = cfg.icon;
+
+    const handleCtaClick = () => {
+        if (role === 'mentor') {
+            if (onOpenKetersediaan) onOpenKetersediaan();
+        } else {
+            navigate('/cari-mentor');
+        }
+    };
 
     return (
         <div className="relative overflow-hidden rounded-3xl border border-dashed border-accent bg-white p-8 text-center shadow-sm sm:p-12">
@@ -542,6 +553,7 @@ function EmptyState({ role }) {
 
             <button
                 type="button"
+                onClick={handleCtaClick}
                 className="relative mt-6 inline-flex items-center gap-2 rounded-full bg-secondary px-6 py-3 text-sm font-bold text-white shadow-lg transition-all hover:brightness-110"
             >
                 {cfg.cta}
@@ -558,9 +570,14 @@ function EmptyState({ role }) {
 /* ============================================================
    KOMPONEN UTAMA
    ============================================================ */
-export default function SessionCardList({ onOpenModal, onNavigateRuangInteraksi }) {
-    const [role, setRole] = useState('mentee'); // 'mentee' | 'mentor'
-    const [kondisi, setKondisi] = useState('berisi'); // 'berisi' | 'kosong'
+export default function SessionCardList({
+    role = 'mentee',
+    hasSchedule = 'terjadwal',
+    onOpenKetersediaan,
+    onOpenModal,
+    onNavigateRuangInteraksi,
+}) {
+    const kondisi = hasSchedule === 'terjadwal' ? 'berisi' : 'kosong';
     const [filterStatus, setFilterStatus] = useState('semua'); // 'semua' | 'dikonfirmasi' | 'menunggu' | 'selesai'
 
     const sessionList = SESSIONS[role] || [];
@@ -569,67 +586,22 @@ export default function SessionCardList({ onOpenModal, onNavigateRuangInteraksi 
         return item.status === filterStatus;
     });
 
-    const pillBase =
-        'rounded-full px-3 py-1 text-xs font-semibold transition-all border';
-    const pillActive = 'bg-secondary text-white border-secondary shadow-sm';
-    const pillIdle =
-        'bg-white text-primary border-accent/60 hover:border-accent hover:bg-accent/10';
-
     return (
         <div className="min-h-screen bg-lightBg p-4 sm:p-8 font-sans">
             <div className="mx-auto max-w-5xl">
 
-                {/* 🛠️ BAR SIMULASI PRESENTASI: Hanya Role & Status Kosong/Berisi */}
-                <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-accent/60 bg-white p-3 shadow-sm sm:flex-row sm:flex-wrap sm:items-center">
-                    <span className="text-sm font-bold text-primary">
-                        🛠️ Simulasi Presentasi:
-                    </span>
-
-                    <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-primary/60">Role:</span>
-                        {ROLE_OPTIONS.map((opt) => (
-                            <button
-                                key={opt.key}
-                                type="button"
-                                onClick={() => setRole(opt.key)}
-                                className={`${pillBase} ${role === opt.key ? pillActive : pillIdle}`}
-                            >
-                                {opt.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-primary/60">Kondisi Data:</span>
-                        {SIMULASI_KONDISI.map((opt) => (
-                            <button
-                                key={opt.key}
-                                type="button"
-                                onClick={() => setKondisi(opt.key)}
-                                className={`${pillBase} ${kondisi === opt.key ? pillActive : pillIdle}`}
-                            >
-                                {opt.label}
-                            </button>
-                        ))}
-                    </div>
+                {/* HEADER JUDUL HALAMAN SESUAI GAMBAR 2 */}
+                <div className="mb-4">
+                    <h1 className="text-3xl font-normal text-primary">
+                        {role === 'mentor' ? 'Manajemen Jadwal Sesi' : 'Jadwal Bimbingan'}
+                    </h1>
                 </div>
 
-                {/* HEADER JADWAL BIMBINGAN & TAB FILTER ASLI */}
-                <div className="mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl sm:text-3xl font-extrabold text-primary">
-                            Jadwal Bimbingan
-                        </h1>
-                        <p className="text-sm text-primary/60 mt-1">
-                            {role === 'mentee'
-                                ? 'Pantau sesi yang kamu pesan dari para mentor.'
-                                : 'Kelola permintaan dan sesi bimbingan dari mentee.'}
-                        </p>
-                    </div>
-
-                    {/* Tab Filter Status Halaman Asli (Hanya muncul jika kondisi ada isi/berisi) */}
-                    {kondisi === 'berisi' && (
-                        <div className="flex flex-wrap items-center gap-1.5 rounded-full border border-accent/70 bg-white p-1.5 shadow-sm">
+                {/* BAR FILTER (KIRI) DAN KETERSEDIAAN + SESI BULAN INI (KANAN - KHUSUS MENTOR) */}
+                {kondisi === 'berisi' && (
+                    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                        {/* PIL FILTER SEPERTI DI CARI MENTOR (GAMBAR 3) */}
+                        <div className="flex flex-wrap items-center gap-2">
                             {FILTER_TABS.map((tab) => {
                                 const isActive = filterStatus === tab.key;
                                 const count =
@@ -642,30 +614,58 @@ export default function SessionCardList({ onOpenModal, onNavigateRuangInteraksi 
                                         key={tab.key}
                                         type="button"
                                         onClick={() => setFilterStatus(tab.key)}
-                                        className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-all flex items-center gap-1.5 ${isActive
-                                                ? 'bg-secondary text-white shadow-sm'
-                                                : 'text-slate-600 hover:text-secondary hover:bg-slate-50'
-                                            }`}
+                                        className={`rounded-full px-4 py-2 text-xs font-semibold transition-all flex items-center gap-2 ${
+                                            isActive
+                                                ? 'bg-secondary text-white shadow-sm border border-secondary'
+                                                : 'bg-white border border-secondary/40 text-secondary hover:bg-secondary/5'
+                                        }`}
                                     >
                                         <span>{tab.label}</span>
-                                        <span
-                                            className={`rounded-full px-1.5 py-0.2 text-[10px] ${isActive
-                                                    ? 'bg-white/20 text-white'
-                                                    : 'bg-slate-100 text-slate-500'
+                                        {count > 0 && (
+                                            <span
+                                                className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                                                    isActive
+                                                        ? 'bg-white/20 text-white'
+                                                        : 'bg-secondary/10 text-secondary'
                                                 }`}
-                                        >
-                                            {count}
-                                        </span>
+                                            >
+                                                {count}
+                                            </span>
+                                        )}
                                     </button>
                                 );
                             })}
                         </div>
-                    )}
-                </div>
+
+                        {/* HANYA MUNCUL DI MENTOR: TOMBOL ATUR KETERSEDIAAN & KOTAK SESI BULAN INI (GAMBAR 2) */}
+                        {role === 'mentor' && (
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={onOpenKetersediaan}
+                                    className="inline-flex items-center gap-2 rounded-full border border-secondary/50 bg-white px-4 py-2 text-xs font-bold text-secondary shadow-sm hover:bg-secondary/10 transition-all hover:scale-[1.02]"
+                                >
+                                    <CalendarDays size={15} className="text-secondary" />
+                                    <span>Atur Ketersediaan</span>
+                                </button>
+
+                                <div className="flex items-center gap-3 rounded-2xl bg-primary px-4 py-2 text-white shadow-sm">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-secondary/30 text-accent">
+                                        <Calendar size={18} />
+                                    </div>
+                                    <div className="leading-tight">
+                                        <p className="text-[10px] text-accent/80 font-medium">Sesi bulan ini</p>
+                                        <p className="text-xl font-bold tracking-tight">00</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* AREA KONTEN UTAMA */}
                 {kondisi === 'kosong' ? (
-                    <EmptyState role={role} />
+                    <EmptyState role={role} onOpenKetersediaan={onOpenKetersediaan} />
                 ) : (
                     <div className="space-y-4">
                         {filteredSessions.length > 0 ? (

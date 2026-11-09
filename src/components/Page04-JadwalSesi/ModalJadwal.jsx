@@ -16,13 +16,12 @@ import {
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
-/*  Font (Montserrat untuk judul/tombol, Merriweather untuk teks isi)  */
+/*  Font styling (selaras dengan font-sans sistem Mentlify)            */
 /* ------------------------------------------------------------------ */
 const FontStyle = () => (
     <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600;700;800&display=swap');
-    .font-head { font-family: 'Montserrat', ui-sans-serif, system-ui, sans-serif; }
-    .font-body { font-family: 'Merriweather', Georgia, serif; }
+    .font-head { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    .font-body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
   `}</style>
 );
 

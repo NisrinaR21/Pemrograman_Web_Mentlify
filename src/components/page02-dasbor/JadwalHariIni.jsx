@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     Calendar,
     Clock,
@@ -10,7 +10,42 @@ import {
     Lock,
     Target,
     Wrench,
+    Sparkles,
 } from 'lucide-react';
+import { QuizModal } from './MisiDanKuis.jsx';
+
+/* ------------------------------------------------------------------ */
+/* SOAL LATIHAN KHUSUS SESI FARHAN AKBAR                              */
+/* ------------------------------------------------------------------ */
+const FARHAN_QUIZ_QUESTIONS = [
+    {
+        id: 201,
+        topik: 'Kalkulus Dasar — Limit & Turunan',
+        text: 'Berapakah nilai dari lim (x→0) (sin x) / x ?',
+        options: ['0', '1', 'Tak hingga', 'Tidak ada'],
+        correct: 1,
+        explanation: 'Limit trigonometri fundamental menyatakan bahwa lim(x→0) (sin x)/x = 1.',
+        xp: 20,
+    },
+    {
+        id: 202,
+        topik: 'Kalkulus Dasar — Limit & Turunan',
+        text: "Jika f(x) = 4x³ − 2x² + 7, maka turunan pertamanya f'(x) adalah ...",
+        options: ['12x² − 4x', '12x² − 2x', '4x² − 4x', '12x³ − 4x'],
+        correct: 0,
+        explanation: "Turunan aturan pangkat: d/dx(4x³) = 12x², d/dx(-2x²) = -4x, d/dx(7) = 0. Jadi f'(x) = 12x² − 4x.",
+        xp: 20,
+    },
+    {
+        id: 203,
+        topik: 'Kalkulus Dasar — Limit & Turunan',
+        text: 'Turunan dari fungsi f(x) = cos(x) terhadap x adalah ...',
+        options: ['sin(x)', '−sin(x)', 'sec(x)', '−cos(x)'],
+        correct: 1,
+        explanation: "Turunan baku fungsi trigonometri kosinus adalah d/dx[cos(x)] = −sin(x).",
+        xp: 20,
+    },
+];
 
 /* ------------------------------------------------------------------ */
 /* DATA DUMMY                                                          */
@@ -160,10 +195,21 @@ function EmptyState({ role, data, onAction }) {
 /* ------------------------------------------------------------------ */
 /* KARTU SESI (TERJADWAL & 15 MENIT)                                   */
 /* ------------------------------------------------------------------ */
-function SessionCard({ role, data, kondisi, hadir, onHadir, onToast }) {
+function SessionCard({
+    role,
+    data,
+    kondisi,
+    is15Menit,
+    hadir,
+    onHadir,
+    onToggle15Menit,
+    onOpenLatihan,
+    quizResult,
+}) {
     const { person, session, banner } = data;
-    const isLive = kondisi === '15menit';
+    const isLive = is15Menit || kondisi === '15menit';
     const isLatihan = banner.type === 'latihan';
+    const jadwalSesiRoute = role === 'mentor' ? '/mentor/jadwal-sesi' : '/mentee/jadwal-sesi';
 
     return (
         <div className="rounded-2xl border border-accent/70 bg-white p-5 shadow-sm transition-all duration-200 hover:border-accent">
@@ -248,17 +294,19 @@ function SessionCard({ role, data, kondisi, hadir, onHadir, onToast }) {
                             </p>
                             <p className="text-sm font-semibold text-primary">{banner.title}</p>
                             <p className="text-xs text-slate-500 md:text-sm">
-                                {banner.description}
+                                {quizResult
+                                    ? `Kuis sudah dikerjakan (${quizResult.correct}/${quizResult.total} benar · +${quizResult.xp} XP)`
+                                    : banner.description}
                             </p>
                         </div>
                     </div>
                     <button
                         type="button"
-                        onClick={() => onToast('Membuka latihan soal dari mentor (simulasi)')}
+                        onClick={onOpenLatihan}
                         className={`${BTN_PRIMARY} shrink-0 whitespace-nowrap`}
                     >
-                        {banner.button}
-                        <ArrowUpRight size={16} />
+                        {quizResult ? 'Lihat Hasil Soal' : banner.button}
+                        {quizResult ? <CheckCircle2 size={16} className="text-accentYellow" /> : <ArrowUpRight size={16} />}
                     </button>
                 </div>
             ) : (
@@ -279,7 +327,7 @@ function SessionCard({ role, data, kondisi, hadir, onHadir, onToast }) {
                     </div>
                     <button
                         type="button"
-                        onClick={() => onToast('Membuka pengelolaan bank soal (simulasi)')}
+                        onClick={onOpenLatihan}
                         className={`${BTN_OUTLINE} shrink-0 whitespace-nowrap`}
                     >
                         {banner.button}
@@ -298,7 +346,7 @@ function SessionCard({ role, data, kondisi, hadir, onHadir, onToast }) {
             <div className="mt-4 flex flex-wrap items-center gap-3">
                 {isLive ? (
                     <>
-                        <Link to="/jadwal-sesi" className={`${BTN_PRIMARY} hover:scale-[1.02]`}>
+                        <Link to={jadwalSesiRoute} className={`${BTN_PRIMARY} hover:scale-[1.02]`}>
                             Buka Ruang Sesi
                         </Link>
                         {hadir ? (
@@ -312,11 +360,28 @@ function SessionCard({ role, data, kondisi, hadir, onHadir, onToast }) {
                                 <Check size={16} />
                             </button>
                         )}
+                        <button
+                            type="button"
+                            onClick={onToggle15Menit}
+                            className="text-xs text-slate-400 hover:text-slate-600 underline ml-1"
+                        >
+                            Reset ke sebelum 15 mnt
+                        </button>
                     </>
                 ) : (
-                    <button type="button" disabled className={BTN_DISABLED}>
-                        Ruang Sesi Belum Dibuka
-                    </button>
+                    <>
+                        <button type="button" disabled className={BTN_DISABLED}>
+                            Ruang Sesi Belum Dibuka
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onToggle15Menit}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-secondary/40 bg-white px-3.5 py-1.5 text-xs font-semibold text-secondary transition-all hover:bg-secondary/10"
+                            title="Simulasikan masuk H-15 menit agar tombol Buka Ruang Sesi aktif"
+                        >
+                            ⏱️ Simulasikan H-15 menit
+                        </button>
+                    </>
                 )}
             </div>
         </div>
@@ -356,11 +421,20 @@ function StatCards({ stats }) {
 /* ------------------------------------------------------------------ */
 /* KOMPONEN UTAMA                                                      */
 /* ------------------------------------------------------------------ */
-function JadwalHariIni({ userRole = 'mentee', showSimulation = true }) {
+function JadwalHariIni({ userRole = 'mentee', showSimulation = true, initialKondisi = 'terjadwal' }) {
     const role = userRole === 'mentor' ? 'mentor' : 'mentee';
-    const [kondisiJadwal, setKondisiJadwal] = useState('kosong');
+    const [kondisiJadwal, setKondisiJadwal] = useState(initialKondisi);
+    const [is15Menit, setIs15Menit] = useState(false);
     const [hadir, setHadir] = useState(false);
     const [toast, setToast] = useState('');
+    const [quizOpen, setQuizOpen] = useState(false);
+    const [quizResult, setQuizResult] = useState(null);
+
+    // sinkronkan jika ada perubahan state jadwal dari navbar
+    useEffect(() => {
+        setKondisiJadwal(initialKondisi);
+        setIs15Menit(false);
+    }, [initialKondisi, userRole]);
 
     // reset status hadir saat kondisi atau role berganti
     useEffect(() => {
@@ -370,47 +444,34 @@ function JadwalHariIni({ userRole = 'mentee', showSimulation = true }) {
     // toast otomatis hilang
     useEffect(() => {
         if (!toast) return undefined;
-        const t = setTimeout(() => setToast(''), 2200);
+        const t = setTimeout(() => setToast(''), 2400);
         return () => clearTimeout(t);
     }, [toast]);
 
     const data = ROLE_DATA[role];
+
+    const navigate = useNavigate();
 
     const handleHadir = () => {
         setHadir(true);
         setToast('Kehadiran kamu berhasil dicatat (simulasi)');
     };
 
+    const handleOpenLatihan = () => {
+        if (role === 'mentee') {
+            setQuizOpen(true);
+        } else {
+            navigate('/mentor/bank-soal');
+        }
+    };
+
+    const handleQuizFinish = (res) => {
+        setQuizResult(res);
+        setToast(`Soal Farhan Akbar selesai! Kamu mendapat +${res.xp} XP`);
+    };
+
     return (
         <section className="w-full">
-            {/* ---------------- BAR SIMULASI ---------------- */}
-            {showSimulation && (
-                <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-primary/30 bg-white px-3 py-2">
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-primary">
-                        <Wrench size={14} />
-                        🛠️ Simulasi Presentasi:
-                    </span>
-
-                    <span className="text-[11px] font-semibold text-slate-500">
-                        Simulasi State
-                    </span>
-
-                    {KONDISI_OPTIONS.map((opt) => (
-                        <button
-                            key={opt.key}
-                            type="button"
-                            onClick={() => setKondisiJadwal(opt.key)}
-                            className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${kondisiJadwal === opt.key
-                                ? 'bg-primary text-white shadow-sm'
-                                : 'border border-accent bg-white text-secondary hover:bg-slate-50'
-                                }`}
-                        >
-                            Jadwal: {opt.label}
-                        </button>
-                    ))}
-                </div>
-            )}
-
             {/* ---------------- JUDUL ---------------- */}
             <h2 className="mb-3 text-lg font-bold text-primary">Jadwal Hari Ini</h2>
 
@@ -427,15 +488,18 @@ function JadwalHariIni({ userRole = 'mentee', showSimulation = true }) {
                         role={role}
                         data={data}
                         kondisi={kondisiJadwal}
+                        is15Menit={is15Menit}
                         hadir={hadir}
                         onHadir={handleHadir}
-                        onToast={setToast}
+                        onToggle15Menit={() => setIs15Menit((prev) => !prev)}
+                        onOpenLatihan={handleOpenLatihan}
+                        quizResult={quizResult}
                     />
                 )}
 
                 {/* toast simulasi */}
                 {toast && (
-                    <div className="absolute right-4 top-4 z-20 flex items-center gap-2 rounded-full border border-accent/70 bg-white px-4 py-2 text-xs font-semibold text-primary shadow-md transition-all duration-200">
+                    <div className="fixed bottom-4 left-1/2 z-[60] flex -translate-x-1/2 items-center gap-2 rounded-full border border-accent/70 bg-white px-4 py-2 text-xs font-semibold text-primary shadow-md transition-all duration-200">
                         <Target size={14} className="text-secondary" />
                         {toast}
                     </div>
@@ -446,6 +510,16 @@ function JadwalHariIni({ userRole = 'mentee', showSimulation = true }) {
             <div className="mt-4">
                 <StatCards stats={data.stats} />
             </div>
+
+            {/* ---------------- MODAL SOAL SESI (MENTEE) ---------------- */}
+            {quizOpen && (
+                <QuizModal
+                    questions={FARHAN_QUIZ_QUESTIONS}
+                    existingResult={quizResult}
+                    onClose={() => setQuizOpen(false)}
+                    onFinish={handleQuizFinish}
+                />
+            )}
         </section>
     );
 }

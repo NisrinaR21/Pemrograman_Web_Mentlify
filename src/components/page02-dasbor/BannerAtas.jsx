@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     ChevronLeft,
     ChevronRight,
@@ -43,6 +44,7 @@ const SLIDES_DATA = {
                 'Temukan mentor terbaik dari berbagai program studi dan mulai belajar lebih terarah bersama kakak tingkatmu.',
             hashtag: '#MentlifyUMRAH',
             cta: 'Cari Mentor Sekarang',
+            to: '/mentee/cari-mentor',
             image: null,
             art: {
                 main: Building2,
@@ -61,6 +63,7 @@ const SLIDES_DATA = {
                 'Pesan sesi 1-on-1 dengan mentor pilihanmu, tentukan topik, dan dapatkan jawaban langsung lewat video call.',
             hashtag: '#BelajarBarengMentor',
             cta: 'Pesan Sesi Bimbingan',
+            to: '/mentee/jadwal-sesi',
             image: null,
             art: {
                 main: Calendar,
@@ -79,6 +82,7 @@ const SLIDES_DATA = {
                 'Ikuti misi harian dan jaga streak belajarmu untuk membuka lencana serta bonus koin eksklusif.',
             hashtag: '#MisiHarianMentlify',
             cta: 'Lihat Misi Saya',
+            to: '#misi-streak',
             image: null,
             art: {
                 main: Trophy,
@@ -99,6 +103,7 @@ const SLIDES_DATA = {
                 'Bantu mentee dari seluruh jurusan berkembang lewat pengalaman akademik dan organisasimu di kampus.',
             hashtag: '#MentorMentlifyUMRAH',
             cta: 'Lihat Permintaan Sesi',
+            to: '/mentor/jadwal-sesi',
             image: null,
             art: {
                 main: GraduationCap,
@@ -117,6 +122,7 @@ const SLIDES_DATA = {
                 'Buka slot waktu yang sesuai dengan kesibukanmu agar mentee dapat memesan sesi dengan mudah.',
             hashtag: '#JadwalFleksibel',
             cta: 'Kelola Jadwal',
+            to: '/mentor/jadwal-sesi',
             image: null,
             art: {
                 main: Calendar,
@@ -135,6 +141,7 @@ const SLIDES_DATA = {
                 'Tambahkan materi dan latihan soal agar sesi bimbingan semakin efektif dan berkesan bagi mentee.',
             hashtag: '#BankSoalSesi',
             cta: 'Kelola Bank Soal',
+            to: '/mentor/bank-soal',
             image: null,
             art: {
                 main: BookOpen,
@@ -207,6 +214,7 @@ function Illustration({ image, art, alt }) {
 /* KOMPONEN UTAMA                                                      */
 /* ------------------------------------------------------------------ */
 function BannerAtas({ userRole = 'mentee', showSimulation = true }) {
+    const navigate = useNavigate();
     const role = userRole === 'mentor' ? 'mentor' : 'mentee';
     const [current, setCurrent] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
@@ -243,8 +251,16 @@ function BannerAtas({ userRole = 'mentee', showSimulation = true }) {
         return () => clearTimeout(t);
     }, [toast]);
 
-    const handleCta = () => {
-        setToast(`Aksi: "${slide.cta}" (simulasi)`);
+    const handleCta = (targetSlide) => {
+        if (!targetSlide.to) return;
+        if (targetSlide.to.startsWith('#')) {
+            const el = document.querySelector(targetSlide.to);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        } else {
+            navigate(targetSlide.to);
+        }
     };
 
     return (
@@ -283,7 +299,7 @@ function BannerAtas({ userRole = 'mentee', showSimulation = true }) {
                                     <div className="mt-4 flex flex-wrap items-center gap-3">
                                         <button
                                             type="button"
-                                            onClick={handleCta}
+                                            onClick={() => handleCta(s)}
                                             className="flex items-center justify-center gap-2 rounded-full bg-secondary px-4 py-2 text-xs font-medium text-white shadow-sm transition-all duration-200 hover:scale-105 hover:brightness-110 md:text-sm"
                                         >
                                             <CtaIcon size={16} />

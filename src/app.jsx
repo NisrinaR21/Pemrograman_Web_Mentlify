@@ -11,6 +11,7 @@ import CariMentorPage from './components/page03-CariMentor/CariMentorPage.jsx';
 import JadwalSesiPage from './pages/JadwalSesiPage.jsx';
 import RatingPage from './pages/RatingPage.jsx';
 import DompetPage from './pages/DompetPage.jsx'; // 1. Tambahkan import DompetPage
+import BankSoalPage from './pages/BankSoalPage.jsx';
 
 function App() {
   const location = useLocation();
@@ -39,6 +40,12 @@ function App() {
     location.pathname === '/onboarding' ||
     location.pathname === '/admin/login';
 
+  // State simulasi jadwal hari ini ('terjadwal' | 'kosong')
+  const [hasSchedule, setHasSchedule] = useState('terjadwal');
+
+  // State simulasi saldo mentee ('cukup' | 'kurang')
+  const [menteeSaldo, setMenteeSaldo] = useState('cukup');
+
   const handleLogout = () => {
     navigate('/login');
   };
@@ -50,13 +57,15 @@ function App() {
 
   return (
     <div className="min-h-screen bg-lightBg font-sans">
-      {!isAuthPage && (
-        <Navbar
-          userRole={userRole}
-          setUserRole={setUserRole}
-          onLogout={handleLogout}
-        />
-      )}
+      <Navbar
+        userRole={userRole}
+        setUserRole={setUserRole}
+        onLogout={handleLogout}
+        hasSchedule={hasSchedule}
+        setHasSchedule={setHasSchedule}
+        menteeSaldo={menteeSaldo}
+        setMenteeSaldo={setMenteeSaldo}
+      />
 
       <Routes>
         {/* =========================================
@@ -74,9 +83,9 @@ function App() {
         {/* =========================================
             2. RUTE DASBOR (DashboardPage)
            ========================================= */}
-        <Route path="/" element={<DashboardPage userRole={userRole} />} />
-        <Route path="/mentee/dasbor" element={<DashboardPage userRole="mentee" />} />
-        <Route path="/mentor/dasbor" element={<DashboardPage userRole="mentor" />} />
+        <Route path="/" element={<DashboardPage userRole={userRole} hasSchedule={hasSchedule} />} />
+        <Route path="/mentee/dasbor" element={<DashboardPage userRole="mentee" hasSchedule={hasSchedule} />} />
+        <Route path="/mentor/dasbor" element={<DashboardPage userRole="mentor" hasSchedule={hasSchedule} />} />
 
         {/* =========================================
             3. RUTE ADMIN (Verifikasi & Keuangan)
@@ -89,22 +98,24 @@ function App() {
         {/* =========================================
             4. RUTE MENTEE: CARI MENTOR
            ========================================= */}
-        <Route path="/cari-mentor" element={<CariMentorPage />} />
-        <Route path="/mentee/cari-mentor" element={<CariMentorPage />} />
+        <Route path="/cari-mentor" element={<CariMentorPage menteeSaldo={menteeSaldo} />} />
+        <Route path="/mentee/cari-mentor" element={<CariMentorPage menteeSaldo={menteeSaldo} />} />
 
         {/* =========================================
-            5. RUTE JADWAL SESI
+            5. RUTE JADWAL SESI & BANK SOAL MENTOR
            ========================================= */}
-        <Route path="/jadwal-sesi" element={<JadwalSesiPage />} />
-        <Route path="/mentee/jadwal-sesi" element={<JadwalSesiPage />} />
-        <Route path="/mentor/jadwal-sesi" element={<JadwalSesiPage />} />
+        <Route path="/jadwal-sesi" element={<JadwalSesiPage userRole={userRole} hasSchedule={hasSchedule} />} />
+        <Route path="/mentee/jadwal-sesi" element={<JadwalSesiPage userRole="mentee" hasSchedule={hasSchedule} />} />
+        <Route path="/mentor/jadwal-sesi" element={<JadwalSesiPage userRole="mentor" hasSchedule={hasSchedule} />} />
+        <Route path="/mentor/bank-soal" element={<BankSoalPage />} />
+        <Route path="/bank-soal" element={<BankSoalPage />} />
 
         {/* =========================================
             6. RUTE RATING
            ========================================= */}
-        <Route path="/rating" element={<RatingPage userRole={userRole} />} />
-        <Route path="/mentee/rating" element={<RatingPage userRole="mentee" />} />
-        <Route path="/mentor/rating" element={<RatingPage userRole="mentor" />} />
+        <Route path="/rating" element={<RatingPage userRole={userRole} hasSchedule={hasSchedule} />} />
+        <Route path="/mentee/rating" element={<RatingPage userRole="mentee" hasSchedule={hasSchedule} />} />
+        <Route path="/mentor/rating" element={<RatingPage userRole="mentor" hasSchedule={hasSchedule} />} />
 
         {/* =========================================
             7. RUTE PROFIL & PENGATURAN (ProfilePage)

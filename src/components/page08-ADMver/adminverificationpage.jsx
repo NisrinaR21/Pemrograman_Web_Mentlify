@@ -233,31 +233,31 @@ function DokumenKartu({ kandidat, skala = 1 }) {
       className="mx-auto w-full max-w-[420px] origin-top bg-white p-6 text-center shadow-lg transition-transform duration-200 sm:p-8"
       style={{ transform: `scale(${skala})` }}
     >
-      <p className="font-['Merriweather'] text-xs font-bold tracking-wide text-secondary">
+      <p className=" text-xs font-bold tracking-wide text-secondary">
         Universitas Maritim Raja Ali Haji
       </p>
-      <h3 className="mt-3 font-['Montserrat'] text-2xl font-light tracking-wide text-primary">
+      <h3 className="mt-3  text-2xl font-light tracking-wide text-primary">
         {judulDokumen(kandidat).toUpperCase()}
       </h3>
 
       <div className="mt-6 border border-slate-200 p-5 text-left">
         <p className="text-xs text-slate-500">Nama</p>
-        <p className="font-['Merriweather'] text-base font-bold uppercase text-primary">
+        <p className=" text-base font-bold uppercase text-primary">
           {kandidat.nama}
         </p>
 
         <p className="mt-4 text-xs text-slate-500">{nomorIndukLabel(kandidat)}</p>
-        <p className="font-['Merriweather'] text-base font-bold text-primary">
+        <p className=" text-base font-bold text-primary">
           {kandidat.nomorInduk}
         </p>
 
         <p className="mt-4 text-xs text-slate-500">{statusAkademikLabel(kandidat)}</p>
-        <p className="font-['Merriweather'] text-base font-bold text-primary">
+        <p className=" text-base font-bold text-primary">
           {kandidat.detailAkademik}
         </p>
       </div>
 
-      <p className="mt-5 font-['Merriweather'] text-xs text-slate-500">
+      <p className="mt-5  text-xs text-slate-500">
         Dokumen privat · Tidak dapat diunduh
       </p>
     </div>
@@ -268,16 +268,16 @@ function PortofolioAkademik({ kandidat }) {
   const { ipk, organisasi, keahlian } = kandidat.portofolio;
   return (
     <div className="mx-auto w-full max-w-[520px] bg-white p-6 text-left shadow-lg sm:p-8">
-      <p className="font-['Merriweather'] text-xs font-bold tracking-wide text-secondary">
+      <p className=" text-xs font-bold tracking-wide text-secondary">
         Ringkasan portofolio akademik
       </p>
-      <h3 className="mt-2 font-['Merriweather'] text-xl font-bold text-primary">{kandidat.nama}</h3>
+      <h3 className="mt-2  text-xl font-bold text-primary">{kandidat.nama}</h3>
       <p className="text-sm text-slate-500">Jurusan {kandidat.jurusan}</p>
 
       <dl className="mt-6 space-y-5 text-sm text-primary">
         <div>
           <dt className="text-xs text-slate-500">IPK terakhir</dt>
-          <dd className="font-['Merriweather'] text-lg font-bold">{ipk}</dd>
+          <dd className=" text-lg font-bold">{ipk}</dd>
         </div>
         <div>
           <dt className="text-xs text-slate-500">Pengalaman organisasi</dt>
@@ -514,64 +514,32 @@ export default function AdminVerificationPage() {
   const adaCatatan = catatan.trim().length > 0;
 
   return (
-    <div className="min-h-screen bg-lightBg font-['Montserrat'] text-primary">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Montserrat:wght@300;400;500;600;700&display=swap');`}</style>
-
-      {/* Bar simulasi presentasi */}
-      <div className="border-b border-dashed border-amber-400 bg-amber-50 px-4 py-2">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-amber-800">🛠️ Simulasi Presentasi:</span>
-          {SIM_STATES.map((s) => (
-            <button
-              key={s.key}
-              type="button"
-              onClick={() => jalankanSimulasi(s.key)}
-              className="rounded border border-amber-400 bg-white px-2.5 py-1 text-xs font-semibold text-amber-900 transition hover:bg-amber-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
-            >
-              {s.label}
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => jalankanSimulasi("awal")}
-            className="ml-auto inline-flex items-center gap-1 rounded bg-primary px-2.5 py-1 text-xs font-semibold text-white transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
-          >
-            <RotateCcw size={12} /> Reset
-          </button>
-        </div>
-      </div>
-
-      {/* Header */}
-      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 sm:px-6">
-        <div className="flex items-center gap-6">
-          <h1 className="font-['Merriweather'] text-lg font-bold text-primary">Verification Admin</h1>
-          <nav className="hidden sm:flex items-center gap-2">
-            <span className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-secondary/10 text-secondary border border-secondary/20">
-              Verifikasi Mentor
-            </span>
-            <button
-              type="button"
-              onClick={() => navigate('/admin/finance')}
-              className="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-500 hover:text-primary hover:bg-slate-100 transition-colors"
-            >
-              Keuangan &amp; Payout
-            </button>
-          </nav>
+    <div className="min-h-screen bg-lightBg font-sans text-primary">
+      {/* Header Admin Verifikasi */}
+      <header className="flex items-center justify-between border-b border-accent/70 bg-white px-6 py-4 shadow-sm sm:px-8">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-white font-bold text-lg shadow-sm">
+            M
+          </div>
+          <div>
+            <h1 className="text-base font-extrabold text-primary">Portal Admin Verifikasi</h1>
+            <p className="text-[11px] text-slate-500 font-medium">Divisi Onboarding &amp; Kelayakan Mentor</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="hidden text-right sm:block">
-            <p className="font-['Merriweather'] text-sm font-bold text-primary">Theo Rodriguez</p>
+          <div className="hidden text-right sm:block leading-tight">
+            <p className="text-sm font-bold text-primary">Theo Rodriguez</p>
             <p className="text-xs text-slate-500">admin_verifikator</p>
           </div>
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-white">
-            <User size={20} />
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary/15 text-secondary">
+            <User size={18} />
           </span>
           <button
             type="button"
             onClick={() => navigate('/admin/login')}
-            className="inline-flex items-center gap-2 rounded border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-red-500 transition hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+            className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-white px-3.5 py-1.5 text-xs font-bold text-red-500 transition hover:bg-red-50 focus:outline-none"
           >
-            <ArrowLeft size={14} /> Keluar
+            <ArrowLeft size={13} /> Keluar
           </button>
         </div>
       </header>
@@ -580,14 +548,14 @@ export default function AdminVerificationPage() {
         {/* Judul halaman */}
         <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h2 className="font-['Merriweather'] text-3xl text-primary">Verifikasi Kelayakan Mentor</h2>
-            <p className="mt-2 font-['Merriweather'] text-sm text-slate-500">
+            <h2 className=" text-3xl text-primary">Verifikasi Kelayakan Mentor</h2>
+            <p className="mt-2  text-sm text-slate-500">
               Antrean dokumen privat untuk keputusan onboarding Mentor.
             </p>
           </div>
           <div className="flex items-center gap-4 bg-primary px-5 py-5 text-white">
-            <span className="font-['Merriweather'] text-sm text-accent">Antrean Hari Ini</span>
-            <span className="font-['Merriweather'] text-3xl">{String(menunggu).padStart(2, "0")}</span>
+            <span className=" text-sm text-accent">Antrean Hari Ini</span>
+            <span className=" text-3xl">{String(menunggu).padStart(2, "0")}</span>
           </div>
         </div>
 
@@ -597,14 +565,14 @@ export default function AdminVerificationPage() {
             <div className="border-b border-slate-200 p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-['Merriweather'] text-xs font-bold text-secondary">
+                  <p className=" text-xs font-bold text-secondary">
                     STATUS: MENUNGGU
                   </p>
-                  <h3 className="mt-1 font-['Merriweather'] text-xl font-bold text-primary">
+                  <h3 className="mt-1  text-xl font-bold text-primary">
                     Antrean Calon Mentor
                   </h3>
                 </div>
-                <span className="rounded-full bg-lightBg px-3 py-1.5 font-['Merriweather'] text-sm font-bold text-secondary">
+                <span className="rounded-full bg-lightBg px-3 py-1.5  text-sm font-bold text-secondary">
                   {menunggu} kandidat
                 </span>
               </div>
@@ -635,7 +603,7 @@ export default function AdminVerificationPage() {
               {daftarTampil.length === 0 ? (
                 <div className="flex h-full min-h-[300px] flex-col items-center justify-center gap-3 px-6 text-center text-slate-500">
                   <Inbox size={36} className="text-accent" />
-                  <p className="font-['Merriweather'] text-sm font-bold text-primary">
+                  <p className=" text-sm font-bold text-primary">
                     Tidak ada calon mentor di antrean
                   </p>
                   <p className="text-xs">
@@ -660,7 +628,7 @@ export default function AdminVerificationPage() {
                         >
                           <Avatar kandidat={k} ukuran="h-10 w-10" />
                           <span className="min-w-0 flex-1">
-                            <span className="block font-['Merriweather'] text-sm font-bold text-primary">
+                            <span className="block  text-sm font-bold text-primary">
                               {k.nama}
                             </span>
                             <span className="block text-sm text-slate-500">
@@ -702,7 +670,7 @@ export default function AdminVerificationPage() {
             {!selected ? (
               <div className="flex min-h-[500px] flex-col items-center justify-center gap-3 px-6 text-center text-slate-500">
                 <FileText size={40} className="text-accent" />
-                <p className="font-['Merriweather'] text-base font-bold text-primary">
+                <p className=" text-base font-bold text-primary">
                   Belum ada kandidat dipilih
                 </p>
                 <p className="text-sm">Pilih calon Mentor dari antrean untuk memeriksa dokumennya.</p>
@@ -714,13 +682,13 @@ export default function AdminVerificationPage() {
                   <div className="flex items-center gap-4">
                     <Avatar kandidat={selected} ukuran="h-14 w-14" />
                     <div>
-                      <p className="font-['Merriweather'] text-xs font-bold text-secondary">
+                      <p className=" text-xs font-bold text-secondary">
                         KANDIDAT TERPILIH
                       </p>
-                      <h3 className="font-['Merriweather'] text-2xl font-bold text-primary">
+                      <h3 className=" text-2xl font-bold text-primary">
                         {selected.nama}
                       </h3>
-                      <p className="font-['Merriweather'] text-sm text-slate-500">
+                      <p className=" text-sm text-slate-500">
                         {selected.email} · UMRAH
                       </p>
                     </div>
@@ -779,7 +747,7 @@ export default function AdminVerificationPage() {
                             >
                               <Minus size={12} />
                             </button>
-                            <span className="w-12 text-center font-['Merriweather'] text-sm font-bold">
+                            <span className="w-12 text-center  text-sm font-bold">
                               {zoom}%
                             </span>
                             <button
@@ -818,7 +786,7 @@ export default function AdminVerificationPage() {
                 <div className="mt-5 border-t border-slate-100 p-5">
                   <label
                     htmlFor="catatan-verifikasi"
-                    className="font-['Merriweather'] text-sm font-bold text-primary"
+                    className=" text-sm font-bold text-primary"
                   >
                     Catatan Verifikasi
                   </label>
@@ -845,7 +813,7 @@ export default function AdminVerificationPage() {
                     </p>
                   )}
 
-                  <div className="mt-3 flex items-start gap-2 bg-lightBg px-4 py-3 font-['Merriweather'] text-sm text-primary">
+                  <div className="mt-3 flex items-start gap-2 bg-lightBg px-4 py-3  text-sm text-primary">
                     <ShieldCheck size={15} className="mt-0.5 shrink-0 text-secondary" />
                     <p>
                       Disetujui: sistem memberikan peran Mentor dan membuat Wallet. Ditolak ke-3 kali:
@@ -885,7 +853,7 @@ export default function AdminVerificationPage() {
                   {selected.result && (
                     <p
                       role="status"
-                      className={`mt-4 flex items-center gap-2 font-['Merriweather'] text-sm font-bold ${
+                      className={`mt-4 flex items-center gap-2  text-sm font-bold ${
                         selected.result.tipe === "bahaya" ? "text-red-500" : "text-secondary"
                       }`}
                     >
@@ -916,7 +884,7 @@ export default function AdminVerificationPage() {
               <div className="flex items-center gap-3">
                 <Avatar kandidat={selected} ukuran="h-11 w-11" />
                 <div>
-                  <h3 id="judul-modal" className="font-['Merriweather'] text-lg font-bold text-primary">
+                  <h3 id="judul-modal" className=" text-lg font-bold text-primary">
                     {modalMode === "review" ? `Dokumen ${selected.nama}` : "Alasan penolakan"}
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -973,7 +941,7 @@ export default function AdminVerificationPage() {
                 <div className="flex-1 overflow-y-auto p-5">
                   <label
                     htmlFor="alasan-penolakan"
-                    className="font-['Merriweather'] text-sm font-bold text-primary"
+                    className=" text-sm font-bold text-primary"
                   >
                     Alasan penolakan
                   </label>

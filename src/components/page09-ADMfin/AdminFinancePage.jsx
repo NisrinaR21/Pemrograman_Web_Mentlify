@@ -170,7 +170,7 @@ function SimulationBar({
     onReset,
 }) {
     const btn =
-        "rounded-none border border-accent bg-white text-secondary hover:bg-secondary/10 font-medium px-3 py-1 text-xs transition-colors";
+        "rounded-xl border border-accent bg-white text-secondary hover:bg-secondary/10 font-medium px-3 py-1 text-xs transition-colors";
 
     return (
         <div className="bg-primary text-white px-8 py-2 flex flex-wrap items-center gap-3 text-xs">
@@ -194,41 +194,33 @@ function SimulationBar({
 
 function AdminHeader({ user, onLogout }) {
     return (
-        <header className="bg-white border-b border-slate-200 px-8 py-3.5 flex items-center justify-between">
-            <div className="flex items-center gap-6">
-                <h1 className="text-lg font-bold text-primary">Finance Admin</h1>
-                <nav className="hidden sm:flex items-center gap-2">
-                    <Link
-                        to="/admin/verifikasi-mentor"
-                        className="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-500 hover:text-primary hover:bg-slate-100 transition-colors"
-                    >
-                        Verifikasi Mentor
-                    </Link>
-                    <Link
-                        to="/admin/finance"
-                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-secondary/10 text-secondary border border-secondary/20"
-                    >
-                        Keuangan &amp; Payout
-                    </Link>
-                </nav>
+        <header className="bg-white border-b border-accent/70 px-6 sm:px-8 py-4 flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-white font-bold text-lg shadow-sm">
+                    M
+                </div>
+                <div>
+                    <h1 className="text-base font-extrabold text-primary">Portal Admin Keuangan</h1>
+                    <p className="text-[11px] text-slate-500 font-medium">Divisi Rekonsiliasi, Payout &amp; Dispute</p>
+                </div>
             </div>
 
             <div className="flex items-center gap-3">
-                <div className="text-right leading-tight">
+                <div className="hidden sm:block text-right leading-tight">
                     <p className="text-sm font-bold text-primary">{user.name}</p>
                     <p className="text-xs text-slate-500">{user.role}</p>
                 </div>
                 <img
                     src={user.avatar}
                     alt={user.name}
-                    className="w-10 h-10 rounded-full border border-accent object-cover bg-lightBg"
+                    className="w-9 h-9 rounded-full border border-accent object-cover bg-lightBg"
                 />
                 <button
                     type="button"
                     onClick={onLogout}
-                    className="rounded-lg border border-slate-300 bg-white hover:bg-red-50 text-red-600 font-bold px-4 py-2 text-sm flex items-center gap-2 transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-white px-3.5 py-1.5 text-xs font-bold text-red-500 transition hover:bg-red-50 focus:outline-none"
                 >
-                    <ArrowLeft size={14} />
+                    <ArrowLeft size={13} />
                     Keluar
                 </button>
             </div>
@@ -250,7 +242,7 @@ function PageHeader({ totalMenunggu }) {
                 </p>
             </div>
 
-            <div className="rounded-none bg-secondary px-5 py-4 flex items-center gap-4 shadow-sm shrink-0">
+            <div className="rounded-xl bg-secondary px-5 py-4 flex items-center gap-4 shadow-sm shrink-0">
                 <span className="text-sm text-accent">Total Menunggu</span>
                 <span className="text-3xl font-extrabold text-white leading-none">
                     {pad2(totalMenunggu)}
@@ -268,7 +260,7 @@ function OperationalBanner({ onAction }) {
     return (
         <div
             role="alert"
-            className="rounded-none bg-amber-100 border border-amber-300 px-5 py-3 flex items-center justify-between gap-4"
+            className="rounded-xl bg-amber-100 border border-amber-300 px-5 py-3 flex items-center justify-between gap-4"
         >
             <div className="flex items-start gap-3">
                 <AlertCircle size={18} className="text-amber-800 mt-0.5 shrink-0" />
@@ -284,7 +276,7 @@ function OperationalBanner({ onAction }) {
             <button
                 type="button"
                 onClick={onAction}
-                className="rounded-none border border-red-400 text-red-500 bg-white hover:bg-red-50 font-bold px-6 py-2 text-sm shrink-0 transition-colors"
+                className="rounded-xl border border-red-400 text-red-500 bg-white hover:bg-red-50 font-bold px-6 py-2 text-sm shrink-0 transition-colors"
             >
                 Tindak Lanjut
             </button>
@@ -301,7 +293,7 @@ function RekeningBadge({ status }) {
     return (
         <span
             className={
-                "rounded-none inline-block px-3 py-1 text-xs font-bold " +
+                "rounded-xl inline-block px-3 py-1 text-xs font-bold " +
                 (verified ? "bg-lightBg text-primary" : "bg-amber-100 text-amber-800")
             }
         >
@@ -320,7 +312,7 @@ function PayoutQueueTable({
     counts,
 }) {
     return (
-        <section className="rounded-none bg-white border border-slate-200 min-w-0">
+        <section className="rounded-xl bg-white border border-slate-200 min-w-0">
             {/* Judul kartu */}
             <div className="px-5 pt-5 pb-4 border-b border-slate-100">
                 <p className="text-[11px] font-bold text-secondary tracking-wider uppercase">
@@ -341,7 +333,7 @@ function PayoutQueueTable({
                             type="button"
                             onClick={() => onFilterChange(f.key)}
                             className={
-                                "rounded-none px-4 py-1.5 text-sm font-bold transition-all " +
+                                "rounded-xl px-4 py-1.5 text-sm font-bold transition-all " +
                                 (active
                                     ? "bg-secondary text-white shadow-sm"
                                     : "border border-accent bg-white text-secondary hover:bg-slate-50")
@@ -442,7 +434,7 @@ function SquareCheckbox({ checked, disabled, onChange, id }) {
             <span
                 aria-hidden="true"
                 className={
-                    "rounded-none w-4 h-4 border flex items-center justify-center transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-secondary/50 " +
+                    "rounded-xl w-4 h-4 border flex items-center justify-center transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-secondary/50 " +
                     (checked
                         ? "bg-secondary border-secondary text-white"
                         : "bg-white border-slate-400")
@@ -466,7 +458,7 @@ function ExecutionPanel({
 }) {
     if (!row) {
         return (
-            <aside className="rounded-none bg-white border border-slate-200 p-5">
+            <aside className="rounded-xl bg-white border border-slate-200 p-5">
                 <p className="text-[11px] font-bold text-secondary tracking-wider uppercase">
                     Detail Payout
                 </p>
@@ -485,18 +477,18 @@ function ExecutionPanel({
     const canReject = pending && reason.trim().length > 0;
 
     const approveClass = canApprove
-        ? "rounded-none bg-secondary hover:brightness-110 text-white font-bold"
-        : "rounded-none bg-slate-200 text-slate-400 font-bold cursor-not-allowed select-none";
+        ? "rounded-xl bg-secondary hover:brightness-110 text-white font-bold"
+        : "rounded-xl bg-slate-200 text-slate-400 font-bold cursor-not-allowed select-none";
 
     const rejectClass = canReject
-        ? "rounded-none border border-red-400 bg-white hover:bg-red-50 text-red-500 font-bold"
-        : "rounded-none border border-red-400 bg-slate-200 text-slate-400 font-bold cursor-not-allowed select-none";
+        ? "rounded-xl border border-red-400 bg-white hover:bg-red-50 text-red-500 font-bold"
+        : "rounded-xl border border-red-400 bg-slate-200 text-slate-400 font-bold cursor-not-allowed select-none";
 
     return (
-        <aside className="rounded-none bg-white border border-slate-200 p-5">
+        <aside className="rounded-xl bg-white border border-slate-200 p-5">
             {/* Judul */}
             <div className="flex items-start gap-3">
-                <span className="rounded-none w-10 h-10 bg-lightBg flex items-center justify-center text-secondary shrink-0">
+                <span className="rounded-xl w-10 h-10 bg-lightBg flex items-center justify-center text-secondary shrink-0">
                     <ShieldCheck size={18} />
                 </span>
                 <div>
@@ -510,7 +502,7 @@ function ExecutionPanel({
             </div>
 
             {/* Validasi nama */}
-            <div className="rounded-none bg-lightBg p-4 mt-5">
+            <div className="rounded-xl bg-lightBg p-4 mt-5">
                 <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                         <p className="text-xs text-slate-500 uppercase">Nama akun mentor</p>
@@ -540,7 +532,7 @@ function ExecutionPanel({
             </div>
 
             {/* Rekening terdekripsi */}
-            <div className="rounded-none bg-white border border-accent p-4 mt-4">
+            <div className="rounded-xl bg-white border border-accent p-4 mt-4">
                 <p className="text-sm font-bold text-secondary flex items-center gap-2">
                     <Lock size={14} />
                     Rekening didekripsi untuk Admin Keuangan
@@ -557,7 +549,7 @@ function ExecutionPanel({
             <label
                 htmlFor="verifikasi-rekening"
                 className={
-                    "rounded-none bg-lightBg p-4 mt-4 flex items-start gap-3 " +
+                    "rounded-xl bg-lightBg p-4 mt-4 flex items-start gap-3 " +
                     (pending ? "cursor-pointer" : "cursor-not-allowed opacity-80")
                 }
             >
@@ -578,7 +570,7 @@ function ExecutionPanel({
             </label>
 
             {/* Rincian nominal */}
-            <div className="rounded-none bg-primary text-white p-4 mt-4">
+            <div className="rounded-xl bg-primary text-white p-4 mt-4">
                 <div className="grid grid-cols-3 gap-3 pb-3 border-b border-white/20">
                     <div>
                         <p className="text-xs text-accent">Koin</p>
@@ -613,7 +605,7 @@ function ExecutionPanel({
                 onChange={(e) => onReasonChange(e.target.value)}
                 placeholder="Wajib diisi jika payout ditolak…"
                 rows={3}
-                className="rounded-none w-full mt-2 bg-lightBg border border-accent p-3 text-sm font-semibold text-primary placeholder:text-slate-400 resize-none focus:outline-none focus:border-secondary disabled:cursor-not-allowed disabled:opacity-70"
+                className="rounded-xl w-full mt-2 bg-lightBg border border-accent p-3 text-sm font-semibold text-primary placeholder:text-slate-400 resize-none focus:outline-none focus:border-secondary disabled:cursor-not-allowed disabled:opacity-70"
             />
 
             {/* Tombol aksi */}

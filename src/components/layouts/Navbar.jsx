@@ -36,10 +36,6 @@ const NAV_ITEMS = {
     { label: 'Rating', to: '/mentor/rating' },
     { label: 'Profil', to: '/mentor/profil' },
   ],
-  admin: [
-    { label: 'Verifikasi Mentor', to: '/admin/verifikasi-mentor' },
-    { label: 'Keuangan & Dispute', to: '/admin/keuangan-dispute' },
-  ],
 };
 
 const ROLE_HOME = {
@@ -141,10 +137,12 @@ function SimulationBar({
   onRoleChange,
   hasUnread,
   setHasUnread,
-  notifOpen,
-  setNotifOpen,
+  hasSchedule = 'terjadwal',
+  onScheduleChange,
   payoutFilled,
   setPayoutFilled,
+  menteeSaldo = 'cukup',
+  setMenteeSaldo,
 }) {
   const isUser = role !== 'admin';
   const isAdmin = role === 'admin';
@@ -171,15 +169,48 @@ function SimulationBar({
 
       {role !== 'admin' && (
         <div className="flex items-center gap-1.5">
+          <span className="font-medium">Jadwal Sesi</span>
+          <SimButton
+            active={hasSchedule === 'terjadwal'}
+            onClick={() => onScheduleChange && onScheduleChange('terjadwal')}
+          >
+            Ada Jadwal
+          </SimButton>
+          <SimButton
+            active={hasSchedule === 'kosong'}
+            onClick={() => onScheduleChange && onScheduleChange('kosong')}
+          >
+            Jadwal Kosong
+          </SimButton>
+        </div>
+      )}
+
+      {role !== 'admin' && (
+        <div className="flex items-center gap-1.5">
+          <span className="font-medium">Saldo Mentee</span>
+          <SimButton
+            active={menteeSaldo === 'cukup'}
+            onClick={() => setMenteeSaldo && setMenteeSaldo('cukup')}
+          >
+            Cukup (50 Koin)
+          </SimButton>
+          <SimButton
+            active={menteeSaldo === 'kurang'}
+            onClick={() => setMenteeSaldo && setMenteeSaldo('kurang')}
+          >
+            Kurang (2 Koin)
+          </SimButton>
+        </div>
+      )}
+
+      {role !== 'admin' && (
+        <div className="flex items-center gap-1.5">
           <span className="font-medium">Notifikasi</span>
           <SimButton active={hasUnread} onClick={() => setHasUnread(true)}>
             Ada notif baru
           </SimButton>
           <SimButton active={!hasUnread} onClick={() => setHasUnread(false)}>
             Kosong
-          </SimButton>
-          <SimButton active={notifOpen} onClick={() => setNotifOpen(true)}>
-            Buka dropdown
           </SimButton>
         </div>
       )}
@@ -458,6 +489,10 @@ export default function Navbar({
   setUserRole,
   onLogout,
   showSimulation = true,
+  hasSchedule = 'terjadwal',
+  setHasSchedule,
+  menteeSaldo = 'cukup',
+  setMenteeSaldo,
 }) {
   // Bila prop tidak dikirim, komponen tetap bisa jalan sendiri untuk demo.
   const [internalRole, setInternalRole] = useState('mentee');
@@ -531,10 +566,12 @@ export default function Navbar({
           onRoleChange={handleRoleChange}
           hasUnread={hasUnread}
           setHasUnread={setHasUnread}
-          notifOpen={notifOpen}
-          setNotifOpen={setNotifOpen}
+          hasSchedule={hasSchedule}
+          onScheduleChange={setHasSchedule}
           payoutFilled={payoutFilled}
           setPayoutFilled={setPayoutFilled}
+          menteeSaldo={menteeSaldo}
+          setMenteeSaldo={setMenteeSaldo}
         />
       )}
 
@@ -597,10 +634,9 @@ export default function Navbar({
                     <NavLink
                       to={item.to}
                       className={({ isActive }) =>
-                        `block rounded-xl px-4 py-3 text-sm transition-colors ${
-                          isActive
-                            ? 'bg-lightBg font-bold text-secondary'
-                            : 'font-semibold text-accent hover:bg-white/10'
+                        `block rounded-xl px-4 py-3 text-sm transition-colors ${isActive
+                          ? 'bg-lightBg font-bold text-secondary'
+                          : 'font-semibold text-accent hover:bg-white/10'
                         }`
                       }
                     >
