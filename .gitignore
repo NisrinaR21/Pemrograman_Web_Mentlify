@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+ai-kit/
+ai-kit
 
 # Editor directories and files
 .vscode/*
